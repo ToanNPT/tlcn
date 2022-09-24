@@ -1,4 +1,4 @@
-package com.myproject.entity;
+package com.myproject.onlinecourses.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,12 +10,13 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@Table(name = "orders")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Order {
     @Id
-    @GenericGenerator(name = "order_id", strategy = "com.myproject.generator.OrderGenerator")
+    @GenericGenerator(name = "order_id", strategy = "com.myproject.onlinecourses.generator.OrderGenerator")
     @GeneratedValue(generator = "order_id")
     private String id;
 

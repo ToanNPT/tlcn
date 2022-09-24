@@ -1,4 +1,4 @@
-package com.myproject.generator;
+package com.myproject.onlinecourses.generator;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -10,15 +10,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class RoleGenerator implements IdentifierGenerator {
+public class CourseGenerator implements IdentifierGenerator {
+
     @Override
     public Serializable generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object o) throws HibernateException {
-        String PREFIX = "ROLE_0";
+        String PREFIX = "COU0";
         String SUFFIX = "";
         try {
             Connection connection = sharedSessionContractImplementor.connection();
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select count(id) from role");
+            ResultSet resultSet = statement.executeQuery("select count(id) from courses");
             if(resultSet.next()) {
                 Integer id = resultSet.getInt(1) + 1;
                 SUFFIX = id.toString();

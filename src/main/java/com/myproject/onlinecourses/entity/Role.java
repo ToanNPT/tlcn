@@ -1,22 +1,20 @@
-package com.myproject.entity;
+package com.myproject.onlinecourses.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "role")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Role {
     @Id
-    @GenericGenerator(name="role_id", strategy = "com.myproject.generator.RoleGenerator")
+    @GenericGenerator(name="role_id", strategy = "com.myproject.onlinecourses.generator.RoleGenerator")
     @GeneratedValue(generator = "role_id")
     private String id;
 

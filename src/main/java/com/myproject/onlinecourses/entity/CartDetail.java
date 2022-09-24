@@ -1,4 +1,4 @@
-package com.myproject.entity;
+package com.myproject.onlinecourses.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,26 +7,21 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "cartdetail")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDetail {
+public class CartDetail {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false)
-    private Order order;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_name", referencedColumnName = "user_name", nullable = false)
-    private Account account;
+    private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", referencedColumnName = "id", nullable = false)
     private Course course;
-
-    @Column(name = "price")
-    private double price;
 }

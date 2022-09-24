@@ -1,4 +1,4 @@
-package com.myproject.entity;
+package com.myproject.onlinecourses.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "payment")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

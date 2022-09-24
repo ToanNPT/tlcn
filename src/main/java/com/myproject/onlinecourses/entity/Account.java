@@ -1,4 +1,4 @@
-package com.myproject.entity;
+package com.myproject.onlinecourses.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,13 +8,12 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "account")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Account {
     @Id
-    @GenericGenerator(name = "account_id", strategy = "com.myproject.generator.AccountGenerator")
-    @GeneratedValue(generator = "account_id")
     @Column(name = "user_name")
     private String username;
 
@@ -25,8 +24,7 @@ public class Account {
     @Column(name = "password")
     private String password;
 
-    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy = "account", cascade = {CascadeType.ALL, CascadeType.DETACH})
     private UserDetail userDetail;
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)

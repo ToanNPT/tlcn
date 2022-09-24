@@ -1,14 +1,14 @@
-package com.myproject.entity;
+package com.myproject.onlinecourses.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Table(name = "coupon")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
