@@ -25,4 +25,10 @@ public class HandleException {
         return new ResponseObject("400", "200", e.getMessage(), null);
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseBody
+    public ResponseObject handleForbidden(){
+        return new ResponseObject("400", "200", "You don't have exact permission to access our sources", null);
+    }
+
 }

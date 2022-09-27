@@ -19,6 +19,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -38,6 +39,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     AccountConvert accountConvert;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Value("${account.get-all.size}")
     int getAllSize;
@@ -82,7 +86,10 @@ public class AccountServiceImpl implements AccountService {
             throw new RuntimeException("Some error occurred when creating account");
         }
 
+        String hashPwd = passwordEncoder.encode(accountDetailDTO.getPassword());
+
         account.setRole(role.get());
+        account.setPassword(hashPwd);
         userDetail.setUsername(account.getUsername());
         account.setUserDetail(userDetail);
         Account savedAccount = accountRepository.save(account);

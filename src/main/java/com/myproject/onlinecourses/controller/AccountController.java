@@ -42,8 +42,10 @@ public class AccountController {
     }
 
     @PutMapping("account/{username}")
-    public ResponseObject updateAccount(@PathVariable("username") String username,
-                                        @RequestBody AccountDetailDTO accountDetailDTO ) throws DuplicateException {
+    public ResponseObject updateAccount(@Validated @PathVariable("username") String username,
+                                        @RequestBody AccountDetailDTO accountDetailDTO, BindingResult bindingResult ) throws DuplicateException {
+        if(bindingResult.hasErrors())
+            throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
         return accountService.updateAccount(username, accountDetailDTO);
     }
 

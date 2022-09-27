@@ -17,7 +17,7 @@ public class Account {
     @Column(name = "user_name")
     private String username;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
     private Role role;
 

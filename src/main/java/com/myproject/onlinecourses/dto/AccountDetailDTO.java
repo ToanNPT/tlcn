@@ -20,7 +20,7 @@ public class AccountDetailDTO {
     private String role;
 
     @NotBlank(message = "password can not empty")
-    @Size(min = 8, max = 32, message = "Password must be between 8 and 32")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
     @NotEmpty(message = "fullname can not empty")
