@@ -1,8 +1,6 @@
 package com.myproject.onlinecourses.security;
 
-import com.myproject.onlinecourses.filters.ExceptionHandlerFilter;
-import com.myproject.onlinecourses.filters.JWTAuthorizationFilter;
-import com.myproject.onlinecourses.filters.JwtAuthenticationFilter;
+import com.myproject.onlinecourses.filters.*;
 import com.myproject.onlinecourses.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -36,6 +33,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public ExceptionHandlerFilter exceptionHandlerFilter(){return new ExceptionHandlerFilter();};
 
+    @Bean
+    public RestAccessDeniedHandler accessDeniedHandler(){return new RestAccessDeniedHandler();}
+
+    @Bean
+    public RestAuthenticationEntryPoint authenticationEntryPoint(){return new RestAuthenticationEntryPoint();}
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -56,8 +58,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilter(new JWTAuthorizationFilter(authenticationManagerBean(), userDetailsService));
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(exceptionHandlerFilter(), JwtAuthenticationFilter.class);
-        http.addFilterBefore(exceptionHandlerFilter(), JWTAuthorizationFilter.class);
+        //http.addFilterBefore(forbiddenException(), JWTAuthorizationFilter.class);
+        http.exceptionHandling().accessDeniedHandler(accessDeniedHandler()).authenticationEntryPoint(authenticationEntryPoint());
     }
-
 
 }

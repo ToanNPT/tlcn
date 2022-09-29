@@ -22,7 +22,6 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             ResponseObject res = new ResponseObject("400", "200", e.getMessage(), null);
             response.getWriter().write(convertToJson(res));
         }
-
     }
 
     public String convertToJson(Object object) throws JsonProcessingException {

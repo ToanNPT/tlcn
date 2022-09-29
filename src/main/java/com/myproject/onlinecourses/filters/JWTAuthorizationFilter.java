@@ -72,8 +72,10 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(user);
                 return new UsernamePasswordAuthenticationToken(user, null,userDetails.getAuthorities());
             }
-            throw new ForbiddenException("Access token did not attached");
+            return null;
         }
-        throw new ForbiddenException("Access token did not attached");
+        else{
+                throw new RuntimeException("Access token did not attached");
+        }
     }
 }
