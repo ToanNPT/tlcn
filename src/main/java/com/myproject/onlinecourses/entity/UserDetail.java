@@ -34,7 +34,7 @@ public class UserDetail {
     @Column(name = "phone")
     private String phone;
 
-    @OneToOne()
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_name")
     private Account account;
 }

@@ -27,7 +27,7 @@ public class Account {
     @OneToOne(mappedBy = "account", cascade = {CascadeType.ALL, CascadeType.DETACH})
     private UserDetail userDetail;
 
-    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumn
     private Cart cart;
 }
