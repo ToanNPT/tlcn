@@ -26,6 +26,9 @@ public class Coupon {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "value")
+    private Double value;
+
     @Column(name = "expired_date")
     private String expiredDate;
 
