@@ -1,14 +1,12 @@
 package com.myproject.onlinecourses.specification;
 
 import com.myproject.onlinecourses.dto.SearchCriteria;
-import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.entity.Category;
 import com.myproject.onlinecourses.entity.Course;
 import com.myproject.onlinecourses.entity.Course_;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.CategoryRepository;
 import com.myproject.onlinecourses.utils.SearchOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -17,7 +15,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 public class CoursesSpecification implements Specification<Course> {
@@ -96,8 +93,8 @@ public class CoursesSpecification implements Specification<Course> {
             }
             else if(criteria.getOperation().equals(SearchOperation.BETWEEN)){
                 String[] arr = criteria.getValue().toString().split(",");
-                double min = Double.valueOf(arr[0]);
-                double max = Double.valueOf(arr[1]);
+                double min = Double.parseDouble(arr[0]);
+                double max = Double.parseDouble(arr[1]);
                 predicates.add(criteriaBuilder.between(root.get(criteria.getKey()), min, max));
             }
         }
