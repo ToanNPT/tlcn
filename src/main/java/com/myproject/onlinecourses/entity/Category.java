@@ -20,4 +20,7 @@ public class Category {
 
     @Column(name="name")
     private String name;
+
+    @Column(name = "isActive")
+    private boolean isActive;
 }

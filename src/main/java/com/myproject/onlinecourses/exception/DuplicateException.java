@@ -1,6 +1,6 @@
 package com.myproject.onlinecourses.exception;
 
-public class DuplicateException extends Exception{
+public class DuplicateException extends RuntimeException{
     public DuplicateException() {
     }
 
