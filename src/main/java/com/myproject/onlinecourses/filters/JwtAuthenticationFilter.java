@@ -1,6 +1,7 @@
 package com.myproject.onlinecourses.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.myproject.onlinecourses.dto.JwtResponse;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.repository.AccountRepository;
@@ -63,11 +64,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
         String accessToken = jwtProvider.generateAccessToken((CustomUserDetails) authResult.getPrincipal());
-        String body = accessToken;
-
-        Map<String, String> jwtRes = new HashMap<>();
-        jwtRes.put("token", accessToken);
-        ResponseObject res = new ResponseObject(jwtRes);
+        JwtResponse jwtResponse = new JwtResponse();
+        jwtResponse.setUsername(authResult.getName());
+        jwtResponse.setToken(accessToken);
+        ResponseObject res = new ResponseObject(jwtResponse);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), res);
     }
