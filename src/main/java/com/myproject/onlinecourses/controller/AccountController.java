@@ -49,4 +49,8 @@ public class AccountController {
         return accountService.updateAccount(username, accountDetailDTO);
     }
 
+    @GetMapping("account/detail/{username}")
+    public ResponseObject getAccountDetail(@PathVariable("username") String username){
+        return accountService.getAccountDetail(username);
+    }
 }

@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -131,5 +132,13 @@ public class AccountServiceImpl implements AccountService {
         Account res = accountRepository.save(account.get());
         return new ResponseObject(accountConvert.mergerAccountDetail(res, userDetail));
     }
-    
+
+    @Override
+    public ResponseObject getAccountDetail(String username){
+        Optional<Account> account = accountRepository.findById(username);
+        if(!account.isPresent()) throw new NotFoundException("Can not find account by username:" + username );
+        return new ResponseObject(accountConvert.accountToDetail(account.get()));
+    }
+
+
 }

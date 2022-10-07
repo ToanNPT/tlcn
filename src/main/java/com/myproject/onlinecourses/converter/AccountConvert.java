@@ -45,4 +45,17 @@ public interface AccountConvert {
             @Mapping(target = "phone", source = "user.phone")
     })
     AccountDetailDTO mergerAccountDetail(Account account, UserDetail user);
+
+    @Mappings({
+            @Mapping(target = "role", source =  "account.role.id"),
+            @Mapping(target = "password", ignore = true),
+            @Mapping(target = "fullname", source = "account.userDetail.fullname"),
+            @Mapping(target = "birthdate", source = "account.userDetail.birthdate"),
+            @Mapping(target = "gender", source = "account.userDetail.gender"),
+            @Mapping(target = "email", source = "account.userDetail.email"),
+            @Mapping(target = "phone", source = "account.userDetail.phone")
+    }
+    )
+    AccountDetailDTO accountToDetail(Account account);
+
 }

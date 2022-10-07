@@ -16,4 +16,6 @@ public interface AccountService {
     ResponseObject deleteAccount(String username);
 
     ResponseObject updateAccount(String username, AccountDetailDTO dto) throws DuplicateException;
+
+    ResponseObject getAccountDetail(String username);
 }

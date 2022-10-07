@@ -17,8 +17,8 @@ public class CoursesVideo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "content_name")
-    private String contentName;
+    @Column(name = "chapter")
+    private String chapter;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", referencedColumnName = "id", nullable = false)

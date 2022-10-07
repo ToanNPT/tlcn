@@ -1,13 +1,10 @@
 package com.myproject.onlinecourses.security;
 
-
-
 import com.auth0.jwt.JWT;
 import com.myproject.onlinecourses.utils.SecurityConstants;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 import java.util.Date;
-
 
 @Component
 public class JwtProvider {
