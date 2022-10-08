@@ -14,8 +14,8 @@ import java.util.Date;
 @AllArgsConstructor
 public class Coupon {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "code", nullable = false)
+    private String code;
 
     @Column(name = "name")
     private String name;
@@ -44,4 +44,13 @@ public class Coupon {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_created", referencedColumnName = "user_name", nullable = false)
     private Account account;
+
+    @Column(name = "num")
+    private int num;
+
+    @Column(name = "number_of_remain" )
+    private int numberOfRemain;
+
+    @Column(name = "is_active")
+    private boolean isActive;
 }
