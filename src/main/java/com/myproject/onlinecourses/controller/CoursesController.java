@@ -18,9 +18,15 @@ public class CoursesController {
     @Autowired
     CoursesService coursesService;
 
-    @GetMapping("all-courses")
+    @GetMapping("courses")
     public ResponseObject getAllCourses(@RequestParam Optional<Integer> page){
         return coursesService.getAll(page);
+    }
+
+
+    @GetMapping("course/{id}")
+    public ResponseObject getById(@PathVariable("id") String id){
+        return coursesService.getById(id);
     }
 
     @PostMapping("courses/search")

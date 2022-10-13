@@ -45,6 +45,15 @@ public class CoursesServiceImpl implements CoursesService {
     CourseConverter converter;
 
     @Override
+    public ResponseObject getById(String id){
+        Optional<Course> course = coursesRepo.findById(id);
+        if(!course.isPresent()){
+            throw new NotFoundException("Can not found course");
+        }
+        return new ResponseObject(converter.entityToCourseDTO(course.get()));
+    }
+
+    @Override
     public ResponseObject getAll(Optional<Integer> page){
         Pageable pageable = PageRequest.of(page.orElse(0), PaginationConstants.COURSES_PAGE_SIZE);
         Page<Course> coursesList = coursesRepo.findAll(pageable);

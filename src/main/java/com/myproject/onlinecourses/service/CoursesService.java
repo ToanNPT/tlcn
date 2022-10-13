@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public interface CoursesService {
 
+    ResponseObject getById(String id);
+
     ResponseObject getAll(Optional<Integer> page);
 
     ResponseObject filterCourses(List<SearchCriteria> conditions);
