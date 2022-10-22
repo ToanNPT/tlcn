@@ -3,6 +3,7 @@ package com.myproject.onlinecourses.dto;
 import com.myproject.onlinecourses.utils.RegexPattern;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import java.util.Date;

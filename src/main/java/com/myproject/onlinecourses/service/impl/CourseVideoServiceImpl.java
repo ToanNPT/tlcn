@@ -1,11 +1,15 @@
 package com.myproject.onlinecourses.service.impl;
 
+import com.myproject.onlinecourses.aws.AwsS3Service;
 import com.myproject.onlinecourses.converter.CourseVideoConverter;
 import com.myproject.onlinecourses.dto.CourseVideoDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
+import com.myproject.onlinecourses.dto.UploadVideoDTO;
+import com.myproject.onlinecourses.entity.Course;
 import com.myproject.onlinecourses.entity.CoursesVideo;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.CourseVideoRepository;
+import com.myproject.onlinecourses.repository.CoursesRepository;
 import com.myproject.onlinecourses.service.CourseVideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +24,12 @@ public class CourseVideoServiceImpl implements CourseVideoService {
 
     @Autowired
     CourseVideoRepository courseVideoRepo;
+
+    @Autowired
+    CoursesRepository coursesRepo;
+
+    @Autowired
+    AwsS3Service s3Service;
 
     @Autowired
     CourseVideoConverter converter;
@@ -41,8 +51,29 @@ public class CourseVideoServiceImpl implements CourseVideoService {
     }
 
     @Override
-    public ResponseObject addNewVideo(CourseVideoDTO dto){
-        return null;
+    public ResponseObject addNewVideo(UploadVideoDTO dto, String username, String courseId){
+        Optional<Course> course = coursesRepo.findById(courseId);
+        if(!course.isPresent() )
+            throw new NotFoundException("Can not find course id");
+        if(dto.getVideo() == null)
+            throw new NotFoundException("Video is not attached");
+
+        String filename = username + "-" + courseId + "-" + dto.getChapter() + "-" + dto.getTitle();
+        String url = s3Service.uploadSingleFile(filename, dto.getVideo());
+
+        if(url == null ) throw new RuntimeException(" Error Internal Server");
+
+        CoursesVideo coursesVideo = new CoursesVideo();
+        coursesVideo.setActive(true);
+        coursesVideo.setCourse(course.get());
+        coursesVideo.setTitle(dto.getTitle());
+        coursesVideo.setChapter(dto.getChapter());
+        coursesVideo.setDescription(dto.getDescription());
+        coursesVideo.setCreateDate(new Date());
+        coursesVideo.setLink(url);
+
+        CoursesVideo res = courseVideoRepo.save(coursesVideo);
+        return new ResponseObject(converter.entityToDTO(res));
     }
 
     @Override
