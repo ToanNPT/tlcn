@@ -15,5 +15,5 @@ public class CartDto {
     private String username;
     private double totalPrice;
     private double paymentPrice;
-    private List<CartDetailDTO> cartDetailList;
+    private List<CourseDTO> cartDetailList;
 }

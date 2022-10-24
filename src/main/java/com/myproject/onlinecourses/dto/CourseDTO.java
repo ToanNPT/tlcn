@@ -22,6 +22,4 @@ public class CourseDTO {
     private Date updateDate;
     private int numStudents;
     private boolean isPublic;
-
-
 }

@@ -1,6 +1,7 @@
 package com.myproject.onlinecourses.service.impl;
 
 import com.myproject.onlinecourses.converter.CartConverter;
+import com.myproject.onlinecourses.converter.CourseConverter;
 import com.myproject.onlinecourses.dto.CartDto;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.entity.Account;
@@ -37,6 +38,9 @@ public class CartServiceImpl implements CartService {
     @Autowired
     CartConverter converter;
 
+    @Autowired
+    CourseConverter courseConverter;
+
     @Override
     public ResponseObject getByUsername(String username){
         Optional<Account> account = accountRepo.findById(username);
@@ -46,7 +50,7 @@ public class CartServiceImpl implements CartService {
 
         CartDto dto = converter.entityToCartDTO(cart.get());
         dto.setCartDetailList(cartDetails.stream()
-                .map(c -> converter.entityToCartDetailDTO(c))
+                .map(c -> courseConverter.entityToCourseDTO(c.getCourse()))
                 .collect(Collectors.toList())
         );
         return new ResponseObject(dto);

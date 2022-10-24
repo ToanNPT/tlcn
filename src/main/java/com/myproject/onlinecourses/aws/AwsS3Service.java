@@ -7,18 +7,17 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectResult;
-import com.myproject.onlinecourses.dto.ResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @PropertySource("classpath:awsservice.properties")
@@ -27,8 +26,17 @@ public class AwsS3Service {
     @Autowired
     Environment environment;
 
+    @Value("${amazonProperties.videoBucket.accessKey}")
+    private String accessKey;
+
+    @Value("${amazonProperties.videoBucket.secretKey}")
+    private String secretKey;
+
+    @Value("${amazonProperties.videoBucket.bucketName}")
+    private String bucketVideo;
+
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
+        File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
         FileOutputStream fos = new FileOutputStream(convFile);
         fos.write(file.getBytes());
         fos.close();
@@ -50,8 +58,8 @@ public class AwsS3Service {
             return s3client.getUrl(bucketName, fileName).toString();
     }
 
+
     public String uploadSingleFile(String fileName, MultipartFile multipartFile) {
-        String endpointUrl = environment.getProperty("amazonProperties.videoBucket.endpointUrl");
         String fileUrl = "";
         try {
             File file = convertMultiPartToFile(multipartFile);
@@ -64,8 +72,21 @@ public class AwsS3Service {
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
         return fileUrl;
+    }
+
+    public boolean deleteObjectInBucket(String bucketName, String filename){
+        AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
+        AmazonS3 s3client = new AmazonS3Client(credentials);
+        s3client.setRegion(Region.getRegion(Regions.US_EAST_1));
+
+        try{
+            s3client.deleteObject(bucketName, filename);
+            return true;
+        }
+        catch(AmazonS3Exception e){
+            return false;
+        }
     }
 
 }

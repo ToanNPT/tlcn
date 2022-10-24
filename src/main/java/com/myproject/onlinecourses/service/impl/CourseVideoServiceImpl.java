@@ -93,6 +93,8 @@ public class CourseVideoServiceImpl implements CourseVideoService {
         Optional<CoursesVideo> video = courseVideoRepo.findById(id);
         if(!video.isPresent()) throw new NotFoundException("Can not find video");
         video.get().setActive(false);
+        String filename = "toanpt-C_01-Introduce Spring boot-How to learn Spring Boot fast and deep?";
+        s3Service.deleteObjectInBucket("toannpt-onlinecourses", filename );
         return new ResponseObject("", "200", "Delete successful", null);
     }
 
