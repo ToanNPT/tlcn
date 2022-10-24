@@ -22,4 +22,8 @@ public interface CoursesService {
     ResponseObject delete(String courseId);
 
     ResponseObject update(String id, CourseDTO dto);
+
+    ResponseObject checkPurchaseCourse(String username, String courseId);
+
+    ResponseObject getListPurchasedCourse(String username);
 }

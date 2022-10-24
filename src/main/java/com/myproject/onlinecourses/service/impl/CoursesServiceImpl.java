@@ -115,4 +115,18 @@ public class CoursesServiceImpl implements CoursesService {
         Course res = coursesRepo.save(updateEntity);
         return new ResponseObject("", "200", "Update successful", converter.entityToCourseDTO(res));
     }
+
+    @Override
+    public ResponseObject checkPurchaseCourse(String username, String courseId){
+        String purchaseCourse = coursesRepo.checkPurchaseCourse(username, courseId);
+        if(purchaseCourse.equals(courseId))
+            return new ResponseObject(true);
+        return new ResponseObject(false);
+    }
+
+    @Override
+    public ResponseObject getListPurchasedCourse(String username){
+        List<String> listPurchasedCourses = coursesRepo.getListPurchasedCourse(username);
+        return new ResponseObject(listPurchasedCourses.toString());
+    }
 }

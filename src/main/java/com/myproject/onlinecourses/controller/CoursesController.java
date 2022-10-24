@@ -49,4 +49,16 @@ public class CoursesController {
     public ResponseObject update(@PathVariable("id") String id, @RequestBody CourseDTO dto){
         return coursesService.update(id, dto);
     }
+
+    @GetMapping("isPurchaseCourse/{username}/{courseId}")
+    public ResponseObject checkPurchasedCourse(@PathVariable("username") String username,
+                                               @PathVariable("courseId") String courseId){
+        return coursesService.checkPurchaseCourse(username, courseId);
+    }
+
+    @GetMapping("listPurchasedCourses/{username}")
+    public ResponseObject getListPurchasedCourses(@PathVariable("username") String username){
+        return coursesService.getListPurchasedCourse(username);
+    }
+
 }
