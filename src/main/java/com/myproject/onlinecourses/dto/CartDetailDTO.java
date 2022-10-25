@@ -13,5 +13,5 @@ import lombok.Setter;
 @Getter
 public class CartDetailDTO {
     private int id;
-    private String courseId;
+    private CourseDTO course;
 }

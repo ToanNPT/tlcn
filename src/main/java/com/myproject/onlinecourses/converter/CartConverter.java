@@ -12,7 +12,7 @@ import org.mapstruct.Mappings;
 public interface CartConverter {
 
     @Mappings(
-            @Mapping(target = "courseId", source = "course.id")
+            @Mapping(target = "course", source = "course")
     )
     CartDetailDTO entityToCartDetailDTO(CartDetail dto);
 
