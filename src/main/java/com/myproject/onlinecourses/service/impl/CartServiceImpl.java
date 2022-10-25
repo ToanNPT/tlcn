@@ -65,7 +65,7 @@ public class CartServiceImpl implements CartService {
         if(account.get().getUsername() != cartDetail.get().getCart().getUsername())
             throw new NotFoundException("Can not delete cart, something wrong");
         cartDetailRepo.delete(cartDetail.get());
-        return new ResponseObject("", "200", "Delete successful", null);
+        return new ResponseObject("", "200", "Delete successful", cartDetail.get());
     }
 
     @Override

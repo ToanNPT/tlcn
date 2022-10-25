@@ -5,11 +5,13 @@ import com.myproject.onlinecourses.dto.AccountDTO;
 import com.myproject.onlinecourses.dto.AccountDetailDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.entity.Account;
+import com.myproject.onlinecourses.entity.Cart;
 import com.myproject.onlinecourses.entity.Role;
 import com.myproject.onlinecourses.entity.UserDetail;
 import com.myproject.onlinecourses.exception.DuplicateException;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.AccountRepository;
+import com.myproject.onlinecourses.repository.CartRepository;
 import com.myproject.onlinecourses.repository.RoleRepository;
 import com.myproject.onlinecourses.repository.UserDetailRepository;
 import com.myproject.onlinecourses.service.AccountService;
@@ -43,6 +45,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    CartRepository cartRepo;
 
     @Value("${account.get-all.size}")
     int getAllSize;
@@ -93,6 +98,16 @@ public class AccountServiceImpl implements AccountService {
         account.setPassword(hashPwd);
         userDetail.setUsername(account.getUsername());
         account.setUserDetail(userDetail);
+
+        Cart yourCart = new Cart();
+        //yourCart.setAccount(savedAccount);
+        yourCart.setUsername(accountDetailDTO.getUsername());
+        yourCart.setTotalPrice(0);
+        yourCart.setPaymentPrice(0);
+
+        yourCart.setAccount(account);
+        account.setCart(yourCart);
+
         Account savedAccount = accountRepository.save(account);
 
         return new ResponseObject(accountConvert.mergerAccountDetail(savedAccount, userDetail));

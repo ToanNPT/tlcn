@@ -76,12 +76,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeHttpRequests()
                 .antMatchers(HttpMethod.POST,"/api/v1/login").permitAll()
+                .antMatchers(HttpMethod.GET, "/actuator").permitAll()
+                .antMatchers(HttpMethod.GET, "/actuator/*").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/courses/search").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/accounts").hasAuthority(Roles.ADMIN.value)
                 .antMatchers(HttpMethod.GET, "/api/v1/account").hasAnyAuthority(Roles.ADMIN.value, Roles.USER.value)
                 .antMatchers(HttpMethod.POST, "/api/v1/account").hasAuthority(Roles.ADMIN.value)
                 .antMatchers(HttpMethod.GET, "/ai/v1/logout").hasAnyAuthority(Roles.ADMIN.value, Roles.USER.value)
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
 
         http.addFilter(new JwtAuthenticationFilter(authenticationManagerBean(), new JwtProvider(),accountRepo ));
         http.addFilter(new JWTAuthorizationFilter(authenticationManagerBean(), userDetailsService));
