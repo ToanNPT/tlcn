@@ -119,7 +119,8 @@ public class CoursesServiceImpl implements CoursesService {
     @Override
     public ResponseObject checkPurchaseCourse(String username, String courseId){
         String purchaseCourse = coursesRepo.checkPurchaseCourse(username, courseId);
-        if(purchaseCourse.equals(courseId))
+
+        if(purchaseCourse != null)
             return new ResponseObject(true);
         return new ResponseObject(false);
     }
