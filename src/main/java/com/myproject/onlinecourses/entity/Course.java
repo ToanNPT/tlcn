@@ -57,6 +57,9 @@ public class Course {
     @Column(name = "is_public")
     private boolean isPublic;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<CoursesVideo> coursesVideoList;
 

@@ -3,6 +3,7 @@ package com.myproject.onlinecourses.service;
 import com.myproject.onlinecourses.dto.CourseDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.dto.SearchCriteria;
+import com.myproject.onlinecourses.dto.UploadCourse;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface CoursesService {
 
     ResponseObject filterCourses(List<SearchCriteria> conditions);
 
-    ResponseObject saveCourse(CourseDTO dto);
+    ResponseObject saveCourse(UploadCourse dto);
 
     ResponseObject delete(String courseId);
 

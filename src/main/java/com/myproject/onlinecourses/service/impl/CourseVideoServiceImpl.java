@@ -12,6 +12,7 @@ import com.myproject.onlinecourses.repository.CourseVideoRepository;
 import com.myproject.onlinecourses.repository.CoursesRepository;
 import com.myproject.onlinecourses.service.CourseVideoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -33,6 +34,9 @@ public class CourseVideoServiceImpl implements CourseVideoService {
 
     @Autowired
     CourseVideoConverter converter;
+
+    @Value("${amazonProperties.videoBucket.bucketName}")
+    private String bucketVideo;
 
     @Override
     public ResponseObject getVideosByCourseId(String courseId){
@@ -59,7 +63,7 @@ public class CourseVideoServiceImpl implements CourseVideoService {
             throw new NotFoundException("Video is not attached");
 
         String filename = username + "-" + courseId + "-" + dto.getChapter() + "-" + dto.getTitle();
-        String url = s3Service.uploadSingleFile(filename, dto.getVideo());
+        String url = s3Service.uploadSingleFile(bucketVideo, filename, dto.getVideo());
 
         if(url == null ) throw new RuntimeException(" Error Internal Server");
 

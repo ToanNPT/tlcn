@@ -1,27 +1,25 @@
 package com.myproject.onlinecourses.dto;
 
-import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.entity.Category;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class CourseDTO {
-    private String id;
+@NoArgsConstructor
+public class UploadCourse {
     private boolean isActive;
-    private Category category;
+    private String category;
     private String language;
     private String name;
     private String description;
     private String accountName;
     private String price;
-    private Date createDate;
-    private Date updateDate;
     private int numStudents;
     private boolean isPublic;
-    private String avatar;
+    private MultipartFile avatar;
 }

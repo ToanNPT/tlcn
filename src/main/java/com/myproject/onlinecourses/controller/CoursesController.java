@@ -3,12 +3,15 @@ package com.myproject.onlinecourses.controller;
 import com.myproject.onlinecourses.dto.CourseDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.dto.SearchCriteria;
+import com.myproject.onlinecourses.dto.UploadCourse;
 import com.myproject.onlinecourses.entity.Course;
 import com.myproject.onlinecourses.repository.CoursesRepository;
 import com.myproject.onlinecourses.service.CoursesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,9 +37,14 @@ public class CoursesController {
         return coursesService.filterCourses(conditions);
     }
 
-    @PostMapping("course/add")
-    public ResponseObject save(@RequestBody CourseDTO course){
-        return coursesService.saveCourse(course);
+//    @PostMapping(value = "course/add")
+//    public ResponseObject save(@ModelAttribute CourseDTO course){
+//        return coursesService.saveCourse(course);
+//    }
+
+    @PostMapping(value = "course/add" , consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseObject saveCourse(@ModelAttribute UploadCourse dto){
+        return coursesService.saveCourse(dto);
     }
 
     @DeleteMapping("course/delete/{courseId}")

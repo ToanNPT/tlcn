@@ -1,9 +1,11 @@
 package com.myproject.onlinecourses.service.impl;
 
+import com.myproject.onlinecourses.aws.AwsS3Service;
 import com.myproject.onlinecourses.converter.CourseConverter;
 import com.myproject.onlinecourses.dto.CourseDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.dto.SearchCriteria;
+import com.myproject.onlinecourses.dto.UploadCourse;
 import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.entity.Category;
 import com.myproject.onlinecourses.entity.Course;
@@ -17,12 +19,14 @@ import com.myproject.onlinecourses.specification.CoursesSpecification;
 import com.myproject.onlinecourses.utils.FilterParam;
 import com.myproject.onlinecourses.utils.PaginationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,8 +45,15 @@ public class CoursesServiceImpl implements CoursesService {
 
     @Autowired
     CategoryRepository getCategoryRepo;
+
     @Autowired
     CourseConverter converter;
+
+    @Autowired
+    AwsS3Service awsS3Service;
+
+    @Value("${amazonProperties.avatarCourse.bucketName}")
+    private String avatarBucket;
 
     @Override
     public ResponseObject getById(String id){
@@ -79,15 +90,25 @@ public class CoursesServiceImpl implements CoursesService {
     }
 
     @Override
-    public ResponseObject saveCourse(CourseDTO dto){
+    public ResponseObject saveCourse(UploadCourse dto){
 
-        Course course = converter.courseDtoToEntity(dto);
+        Course course = converter.uploadToEntity(dto);
         Optional<Account> account = accountRepository.findById(dto.getAccountName());
+        Optional<Category> category = categoryRepos.findById(dto.getCategory());
 
-        if(!account.isPresent())
+        if(!account.isPresent() || !category.isPresent())
             throw new NotFoundException("Data not valid");
+
+        String filename = account.get().getUsername() + "-" + dto.getName();
+        String url = awsS3Service.uploadSingleFile(avatarBucket, filename, dto.getAvatar());
+
         course.setAccount(account.get());
         course.setNumStudents(0);
+        course.setAvatar(url);
+        course.setCategory(category.get());
+        course.setUpdateDate(new Date());
+        course.setUpdateDate(null);
+
         Course res = coursesRepo.save(course);
         return new ResponseObject(converter.entityToCourseDTO(res));
     }

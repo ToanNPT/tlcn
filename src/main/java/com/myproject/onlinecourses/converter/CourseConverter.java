@@ -1,6 +1,7 @@
 package com.myproject.onlinecourses.converter;
 
 import com.myproject.onlinecourses.dto.CourseDTO;
+import com.myproject.onlinecourses.dto.UploadCourse;
 import com.myproject.onlinecourses.entity.Course;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,4 +22,14 @@ public interface CourseConverter {
             @Mapping(target = "active", source = "dto.active")
     })
     Course courseDtoToEntity(CourseDTO dto);
+
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "avatar", ignore = true),
+            @Mapping(target = "account", ignore = true ),
+            @Mapping(target = "numStudents", ignore = true),
+            @Mapping(target = "active", source = "dto.active"),
+            @Mapping(target = "category", ignore = true)
+    })
+    Course uploadToEntity(UploadCourse dto);
 }

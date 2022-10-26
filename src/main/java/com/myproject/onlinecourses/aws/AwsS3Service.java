@@ -35,6 +35,9 @@ public class AwsS3Service {
     @Value("${amazonProperties.videoBucket.bucketName}")
     private String bucketVideo;
 
+    @Value("${amazonProperties.avatarCourse.bucketName}")
+    private String buckeAvaterCourse;
+
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
         File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
         FileOutputStream fos = new FileOutputStream(convFile);
@@ -43,27 +46,29 @@ public class AwsS3Service {
         return convFile;
     }
 
-    private String uploadFileTos3bucket(String fileName, File file) {
+    private String uploadFileTos3bucket(String bucketname, String fileName, File file) {
         String accessKey = environment.getProperty("amazonProperties.videoBucket.accessKey");
         String secretKey = environment.getProperty("amazonProperties.videoBucket.secretKey");
-        String bucketName = environment.getProperty("amazonProperties.videoBucket.bucketName");
 
             AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
             AmazonS3 s3client = new AmazonS3Client(credentials);
-            s3client.setRegion(Region.getRegion(Regions.US_EAST_1));
-            PutObjectRequest request = new PutObjectRequest(bucketName, fileName, file);
+            if(bucketname.equals(bucketVideo))
+                s3client.setRegion(Region.getRegion(Regions.US_EAST_1));
+            else if(bucketname.equals(buckeAvaterCourse))
+                s3client.setRegion(Region.getRegion(Regions.US_WEST_2));
+            PutObjectRequest request = new PutObjectRequest(bucketname, fileName, file);
             request.withCannedAcl(CannedAccessControlList.PublicRead);
 
             s3client.putObject(request);
-            return s3client.getUrl(bucketName, fileName).toString();
+            return s3client.getUrl(bucketname, fileName).toString();
     }
 
 
-    public String uploadSingleFile(String fileName, MultipartFile multipartFile) {
+    public String uploadSingleFile(String bucketname, String fileName, MultipartFile multipartFile) {
         String fileUrl = "";
         try {
             File file = convertMultiPartToFile(multipartFile);
-            fileUrl = uploadFileTos3bucket(fileName, file);
+            fileUrl = uploadFileTos3bucket(bucketname, fileName, file);
             file.delete();
         }
         catch (AmazonS3Exception ex){
