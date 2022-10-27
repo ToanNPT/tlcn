@@ -17,8 +17,8 @@ public class CartController {
     }
 
     @DeleteMapping("cart/{username}/{id}")
-    public ResponseObject delete(@PathVariable("id") int id, @PathVariable("username") String username){
-        return cartService.delete(id, username);
+    public ResponseObject delete(@PathVariable("id") String courseId, @PathVariable("username") String username){
+        return cartService.delete(courseId, username);
     }
 
     @PostMapping("cart/{username}/{courseId}")

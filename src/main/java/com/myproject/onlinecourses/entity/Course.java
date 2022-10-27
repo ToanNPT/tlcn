@@ -40,7 +40,7 @@ public class Course {
     private Account account;
 
     @Column(name = "price")
-    private String price;
+    private double price;
 
     @Column(name = "is_active")
     private boolean isActive;

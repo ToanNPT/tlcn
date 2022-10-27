@@ -3,6 +3,7 @@ package com.myproject.onlinecourses.service.impl;
 import com.myproject.onlinecourses.converter.CartConverter;
 import com.myproject.onlinecourses.converter.CourseConverter;
 import com.myproject.onlinecourses.dto.CartDto;
+import com.myproject.onlinecourses.dto.CourseDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.entity.Cart;
@@ -41,6 +42,7 @@ public class CartServiceImpl implements CartService {
     @Autowired
     CourseConverter courseConverter;
 
+
     @Override
     public ResponseObject getByUsername(String username){
         Optional<Account> account = accountRepo.findById(username);
@@ -57,15 +59,22 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResponseObject delete(int id, String username){
+    public ResponseObject delete(String id, String username){
         Optional<Account> account = accountRepo.findById(username);
         if(!account.isPresent()) throw new NotFoundException("Can not found username: " + username);
-        Optional<CartDetail> cartDetail = cartDetailRepo.findById(id);
+        Optional<CartDetail> cartDetail = cartDetailRepo.getFirstByUsernameAndCourseId(username, id);
         if(!cartDetail.isPresent()) throw new NotFoundException("Can not found your item");
         if(account.get().getUsername() != cartDetail.get().getCart().getUsername())
             throw new NotFoundException("Can not delete cart, something wrong");
+        Optional<Cart> cart = cartRepo.findById(username);
+        double total = cart.get().getTotalPrice() - cartDetail.get().getCourse().getPrice();
+        cart.get().setTotalPrice(Math.round(total*100)/100.00);
+        cart.get().setPaymentPrice(Math.round(total*100)/100.00);
         cartDetailRepo.delete(cartDetail.get());
-        return new ResponseObject("", "200", "Delete successful", cartDetail.get());
+        cartRepo.save(cart.get());
+        CourseDTO courseDTO = courseConverter.entityToCourseDTO(cartDetail.get().getCourse());
+
+        return new ResponseObject("", "200", "Delete successful", courseDTO);
     }
 
     @Override
@@ -77,7 +86,11 @@ public class CartServiceImpl implements CartService {
         CartDetail cartDetail = new CartDetail();
         cartDetail.setCart(cart.get());
         cartDetail.setCourse(course.get());
+        double total = cart.get().getTotalPrice() + course.get().getPrice();
         CartDetail res = cartDetailRepo.save(cartDetail);
+        cart.get().setTotalPrice(total);
+        cart.get().setPaymentPrice(total);
+        cartRepo.save(cart.get());
         return new ResponseObject(converter.entityToCartDetailDTO(res));
     }
 

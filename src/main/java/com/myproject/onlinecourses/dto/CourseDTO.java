@@ -18,7 +18,7 @@ public class CourseDTO {
     private String name;
     private String description;
     private String accountName;
-    private String price;
+    private double price;
     private Date createDate;
     private Date updateDate;
     private int numStudents;
