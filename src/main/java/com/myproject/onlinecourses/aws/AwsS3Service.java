@@ -38,6 +38,9 @@ public class AwsS3Service {
     @Value("${amazonProperties.avatarCourse.bucketName}")
     private String buckeAvaterCourse;
 
+    @Value("${amazonProperties.resource.bucketName}")
+    private String bucketResource;
+
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
         File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
         FileOutputStream fos = new FileOutputStream(convFile);
@@ -54,7 +57,7 @@ public class AwsS3Service {
             AmazonS3 s3client = new AmazonS3Client(credentials);
             if(bucketname.equals(bucketVideo))
                 s3client.setRegion(Region.getRegion(Regions.US_EAST_1));
-            else if(bucketname.equals(buckeAvaterCourse))
+            else if(bucketname.equals(buckeAvaterCourse) || bucketname.equals(bucketResource))
                 s3client.setRegion(Region.getRegion(Regions.US_WEST_2));
             PutObjectRequest request = new PutObjectRequest(bucketname, fileName, file);
             request.withCannedAcl(CannedAccessControlList.PublicRead);
