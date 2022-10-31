@@ -145,7 +145,7 @@ public class AccountServiceImpl implements AccountService {
 
         account.get().setUserDetail(userDetail);
         Account res = accountRepository.save(account.get());
-        return new ResponseObject(accountConvert.mergerAccountDetail(res, userDetail));
+        return new ResponseObject(accountConvert.accountToDetail(res));
     }
 
     @Override
