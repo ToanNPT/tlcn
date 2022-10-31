@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.Optional;
 
 
@@ -61,8 +62,15 @@ public class AccountController {
     }
 
     @PostMapping("account/changePassword")
-    public ResponseObject changePassword(@RequestBody ChangePassword dto, HttpServletRequest req,
-                                         HttpServletResponse res){
+    public ResponseObject changePassword( @Validated @RequestBody ChangePassword dto,
+                                          BindingResult bindingResult,
+                                          HttpServletRequest req,
+                                          HttpServletResponse res){
+        if(bindingResult.hasErrors()){
+            throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
+            //return new ResponseObject("400", "200", bindingResult.getFieldError().getDefaultMessage(), null);
+        }
+
         ResponseObject result = accountService.changePassword(dto);
         if(result.getErrorCode() == "" || result.getErrorCode() == null){
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
