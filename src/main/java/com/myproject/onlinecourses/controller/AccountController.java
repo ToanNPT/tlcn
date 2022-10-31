@@ -1,14 +1,20 @@
 package com.myproject.onlinecourses.controller;
 
 import com.myproject.onlinecourses.dto.AccountDetailDTO;
+import com.myproject.onlinecourses.dto.ChangePassword;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.exception.DuplicateException;
 import com.myproject.onlinecourses.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 
@@ -52,5 +58,19 @@ public class AccountController {
     @GetMapping("account/detail/{username}")
     public ResponseObject getAccountDetail(@PathVariable("username") String username){
         return accountService.getAccountDetail(username);
+    }
+
+    @PostMapping("account/changePassword")
+    public ResponseObject changePassword(@RequestBody ChangePassword dto, HttpServletRequest req,
+                                         HttpServletResponse res){
+        ResponseObject result = accountService.changePassword(dto);
+        if(result.getErrorCode() == "" || result.getErrorCode() == null){
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if(auth != null){
+                new SecurityContextLogoutHandler().logout(req, res, auth);
+                return result;
+            }
+        }
+        return new ResponseObject("400", "200", "Can not update password, something was wrong", null);
     }
 }

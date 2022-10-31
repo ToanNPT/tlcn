@@ -1,8 +1,10 @@
 package com.myproject.onlinecourses.service.impl;
 
+import com.myproject.onlinecourses.controller.SecurityController;
 import com.myproject.onlinecourses.converter.AccountConvert;
 import com.myproject.onlinecourses.dto.AccountDTO;
 import com.myproject.onlinecourses.dto.AccountDetailDTO;
+import com.myproject.onlinecourses.dto.ChangePassword;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.entity.Cart;
@@ -10,6 +12,7 @@ import com.myproject.onlinecourses.entity.Role;
 import com.myproject.onlinecourses.entity.UserDetail;
 import com.myproject.onlinecourses.exception.DuplicateException;
 import com.myproject.onlinecourses.exception.NotFoundException;
+import com.myproject.onlinecourses.exception.NotMatchException;
 import com.myproject.onlinecourses.repository.AccountRepository;
 import com.myproject.onlinecourses.repository.CartRepository;
 import com.myproject.onlinecourses.repository.RoleRepository;
@@ -21,7 +24,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -155,5 +161,26 @@ public class AccountServiceImpl implements AccountService {
         return new ResponseObject(accountConvert.accountToDetail(account.get()));
     }
 
+    @Override
+    public ResponseObject changePassword(ChangePassword dto){
+        Optional<Account> account = accountRepository.findById(dto.getUsername());
+        if(!account.isPresent())
+            throw new NotFoundException("Can not find your account: " + dto.getUsername());
+
+        if(!dto.getConfirmPwd().equals(dto.getNewPwd()))
+            throw new NotMatchException("Confirm password does not match");
+
+        boolean check = passwordEncoder.matches(dto.getOldPwd(), account.get().getPassword());
+        if(!check){
+            throw new NotMatchException("Your old password does not match");
+        }
+        if(dto.getOldPwd().equals(dto.getNewPwd()))
+            throw new DuplicateException("Your old pass matches with new pass, please try again");
+
+        String pwdHashcode = passwordEncoder.encode(dto.getNewPwd());
+        account.get().setPassword(pwdHashcode);
+        accountRepository.save(account.get());
+        return new ResponseObject("", "200", "Update new password successful", true);
+    }
 
 }

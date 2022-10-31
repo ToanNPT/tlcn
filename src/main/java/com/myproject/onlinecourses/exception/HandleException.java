@@ -31,4 +31,10 @@ public class HandleException {
         return new ResponseObject("400", "200", "You don't have exact permission to access our sources", null);
     }
 
+    @ExceptionHandler(NotMatchException.class)
+    @ResponseBody
+    public ResponseObject handleNotMatches(NotMatchException e){
+        return new ResponseObject("400", "200", e.getMessage(), null);
+    }
+
 }

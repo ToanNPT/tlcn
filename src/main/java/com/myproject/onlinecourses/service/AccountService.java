@@ -1,6 +1,7 @@
 package com.myproject.onlinecourses.service;
 
 import com.myproject.onlinecourses.dto.AccountDetailDTO;
+import com.myproject.onlinecourses.dto.ChangePassword;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.exception.DuplicateException;
 
@@ -18,4 +19,6 @@ public interface AccountService {
     ResponseObject updateAccount(String username, AccountDetailDTO dto) throws DuplicateException;
 
     ResponseObject getAccountDetail(String username);
+
+    ResponseObject changePassword(ChangePassword dto);
 }
