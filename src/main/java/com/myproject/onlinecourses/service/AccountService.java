@@ -2,6 +2,7 @@ package com.myproject.onlinecourses.service;
 
 import com.myproject.onlinecourses.dto.AccountDetailDTO;
 import com.myproject.onlinecourses.dto.ChangePassword;
+import com.myproject.onlinecourses.dto.ResetPass;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.exception.DuplicateException;
 
@@ -23,4 +24,6 @@ public interface AccountService {
     ResponseObject changePassword(ChangePassword dto);
 
     ResponseObject sendResetPwdLink(String email);
+
+    ResponseObject resetPassword(String token, ResetPass dto);
 }

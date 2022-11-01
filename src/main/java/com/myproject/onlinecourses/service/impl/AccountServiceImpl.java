@@ -2,10 +2,7 @@ package com.myproject.onlinecourses.service.impl;
 
 import com.myproject.onlinecourses.controller.SecurityController;
 import com.myproject.onlinecourses.converter.AccountConvert;
-import com.myproject.onlinecourses.dto.AccountDTO;
-import com.myproject.onlinecourses.dto.AccountDetailDTO;
-import com.myproject.onlinecourses.dto.ChangePassword;
-import com.myproject.onlinecourses.dto.ResponseObject;
+import com.myproject.onlinecourses.dto.*;
 import com.myproject.onlinecourses.entity.*;
 import com.myproject.onlinecourses.exception.DuplicateException;
 import com.myproject.onlinecourses.exception.NotFoundException;
@@ -210,9 +207,32 @@ public class AccountServiceImpl implements AccountService {
         token.setToken(valueToken);
 
         tokenRepo.save(token);
-        Mail mail = mailService.createTokenMail(account.get(), "REQUEST RESET PASSWORD", valueToken);
-        mailService.sendMail(mail);
+        Mail prepareMail = mailService.createTokenMail(account.get(), "REQUEST RESET PASSWORD", valueToken);
+        mailService.sendMail(prepareMail);
         return new ResponseObject("", "200", "Send reset mail successfully", null);
+    }
+
+    @Override
+    public ResponseObject resetPassword(String token, ResetPass dto){
+        Optional<Token> found = tokenRepo.getTokenByTokenValue(token);
+        if(!found.isPresent())
+            throw new NotFoundException("Token is not found");
+
+        Date date = new Date();
+        if(date.after(found.get().getExp()) || date.before(found.get().getIat())){
+            throw new RuntimeException("Token is not valid");
+        }
+
+        if(!dto.getNewPwd().equals(dto.getConfirmPwd())){
+            throw new NotMatchException("Your confirm password not matches");
+        }
+
+        Optional<Account> account = accountRepository.findById(found.get().getAccount().getUsername());
+        String hashPwd = passwordEncoder.encode(dto.getNewPwd());
+        account.get().setPassword(hashPwd);
+        accountRepository.save(account.get());
+        tokenRepo.delete(found.get());
+        return new ResponseObject("", "200", "Reset password successful", null);
     }
 
 }

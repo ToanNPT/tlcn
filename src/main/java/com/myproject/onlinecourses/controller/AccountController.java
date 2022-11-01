@@ -2,8 +2,10 @@ package com.myproject.onlinecourses.controller;
 
 import com.myproject.onlinecourses.dto.AccountDetailDTO;
 import com.myproject.onlinecourses.dto.ChangePassword;
+import com.myproject.onlinecourses.dto.ResetPass;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.exception.DuplicateException;
+import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -82,8 +84,16 @@ public class AccountController {
         return new ResponseObject("400", "200", "Can not update password, something was wrong", null);
     }
 
-    @PostMapping("account/reset/{email}")
+    @PostMapping("account/requestResetPassword/{email}")
     public ResponseObject sendResetMail(@PathVariable String email){
         return accountService.sendResetPwdLink(email);
+    }
+
+    @PostMapping("account/resetPassword/{token}")
+    public ResponseObject resetPassword(@PathVariable("token") Optional<String> token, @RequestBody ResetPass dto){
+        if(!token.isPresent())
+            throw new NotFoundException("Token is not found");
+        return accountService.resetPassword(token.get(), dto);
+
     }
 }

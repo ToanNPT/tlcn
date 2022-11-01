@@ -4,6 +4,7 @@ import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.mail.Mail;
 import com.myproject.onlinecourses.mail.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -25,10 +26,13 @@ public class MailServiceImpl implements MailService {
     @Autowired
     SpringTemplateEngine templateEngine;
 
+    @Value("${spring.mail.username}")
+    String serverMail;
+
     @Override
     public Mail createTokenMail(Account account, String subject, String token){
         Mail mail = new Mail();
-        mail.setFrom("fpt.training.hcmute@gmail.com");
+        mail.setFrom(serverMail);
         mail.setTo(account.getUserDetail().getEmail());
         mail.setSubject(subject);
 
