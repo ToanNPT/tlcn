@@ -6,18 +6,16 @@ import com.myproject.onlinecourses.dto.AccountDTO;
 import com.myproject.onlinecourses.dto.AccountDetailDTO;
 import com.myproject.onlinecourses.dto.ChangePassword;
 import com.myproject.onlinecourses.dto.ResponseObject;
-import com.myproject.onlinecourses.entity.Account;
-import com.myproject.onlinecourses.entity.Cart;
-import com.myproject.onlinecourses.entity.Role;
-import com.myproject.onlinecourses.entity.UserDetail;
+import com.myproject.onlinecourses.entity.*;
 import com.myproject.onlinecourses.exception.DuplicateException;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.exception.NotMatchException;
-import com.myproject.onlinecourses.repository.AccountRepository;
-import com.myproject.onlinecourses.repository.CartRepository;
-import com.myproject.onlinecourses.repository.RoleRepository;
-import com.myproject.onlinecourses.repository.UserDetailRepository;
+import com.myproject.onlinecourses.mail.Mail;
+import com.myproject.onlinecourses.mail.MailService;
+import com.myproject.onlinecourses.repository.*;
 import com.myproject.onlinecourses.service.AccountService;
+import com.myproject.onlinecourses.utils.Generator;
+import com.myproject.onlinecourses.utils.TokenConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -31,6 +29,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -57,6 +56,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Value("${account.get-all.size}")
     int getAllSize;
+
+    @Autowired
+    TokenRepository tokenRepo;
+
+    @Autowired
+    Generator generator;
+
+    @Autowired
+    MailService mailService;
 
     @Override
     public ResponseObject getAllAccount(Optional<Integer> page){
@@ -181,6 +189,30 @@ public class AccountServiceImpl implements AccountService {
         account.get().setPassword(pwdHashcode);
         accountRepository.save(account.get());
         return new ResponseObject("", "200", "Update new password successful", true);
+    }
+
+    @Override
+    public ResponseObject sendResetPwdLink(String email){
+        Optional<Account> account = accountRepository.findAccountByEmail(email);
+        if(!account.isPresent())
+            throw new NotFoundException("Can not find your account with mail " + email);
+
+        List<Token> validTokens = tokenRepo.getValidTokenByUsername(account.get().getUsername(), new Date());
+        if(!validTokens.isEmpty())
+            throw new DuplicateException("You jus request reset password");
+
+        Date iat = new Date();
+        String valueToken = generator.generateToken();
+        Token token = new Token();
+        token.setAccount(account.get());
+        token.setIat(iat);
+        token.setExp(new Date(iat.getTime() + TokenConstants.PWD_RESET_TIME_TOKEN));
+        token.setToken(valueToken);
+
+        tokenRepo.save(token);
+        Mail mail = mailService.createTokenMail(account.get(), "REQUEST RESET PASSWORD", valueToken);
+        mailService.sendMail(mail);
+        return new ResponseObject("", "200", "Send reset mail successfully", null);
     }
 
 }

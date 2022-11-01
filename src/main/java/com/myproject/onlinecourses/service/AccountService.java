@@ -21,4 +21,6 @@ public interface AccountService {
     ResponseObject getAccountDetail(String username);
 
     ResponseObject changePassword(ChangePassword dto);
+
+    ResponseObject sendResetPwdLink(String email);
 }

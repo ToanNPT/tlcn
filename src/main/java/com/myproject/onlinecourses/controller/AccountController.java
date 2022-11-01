@@ -81,4 +81,9 @@ public class AccountController {
         }
         return new ResponseObject("400", "200", "Can not update password, something was wrong", null);
     }
+
+    @PostMapping("account/reset/{email}")
+    public ResponseObject sendResetMail(@PathVariable String email){
+        return accountService.sendResetPwdLink(email);
+    }
 }

@@ -17,4 +17,16 @@ public interface CoursesRepository extends JpaRepository<Course, String>, JpaSpe
             "from OrderDetail  as o " +
             "where o.account.username = :username and o.order.isActive = true")
     List<String> getListPurchasedCourse(String username);
+
+    @Query(value = "select * " +
+            "from courses as c " +
+            "order by c.create_date desc " +
+            "limit :limit", nativeQuery = true)
+    List<Course> findNewestCourses(int limit);
+
+    @Query(value = "select * " +
+            "from courses  as c " +
+            "order by c.num_students desc " +
+            "limit :limit", nativeQuery = true)
+    List<Course> findByTopNumStudents(int limit);
 }
