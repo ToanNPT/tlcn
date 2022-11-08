@@ -30,7 +30,7 @@ public class Coupon {
     private Double value;
 
     @Column(name = "expired_date")
-    private String expiredDate;
+    private Date expiredDate;
 
     @Column(name = "start_date")
     private Date startDate;

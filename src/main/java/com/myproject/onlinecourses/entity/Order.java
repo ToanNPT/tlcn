@@ -16,8 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 public class Order {
     @Id
-    @GenericGenerator(name = "order_id", strategy = "com.myproject.onlinecourses.generator.OrderGenerator")
-    @GeneratedValue(generator = "order_id")
+    @Column(length = 255)
+//    @GenericGenerator(name = "order_id", strategy = "com.myproject.onlinecourses.generator.OrderGenerator")
+//    @GeneratedValue(generator = "order_id")
     private String id;
 
 

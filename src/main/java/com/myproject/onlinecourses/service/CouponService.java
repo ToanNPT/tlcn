@@ -15,4 +15,6 @@ public interface CouponService {
     ResponseObject addCoupon(CouponDTO dto);
 
     ResponseObject activeCoupon(String code);
+
+    boolean isCouponValid(String code);
 }

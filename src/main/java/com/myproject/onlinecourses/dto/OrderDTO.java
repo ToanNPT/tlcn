@@ -26,5 +26,5 @@ public class OrderDTO {
     private int qty;
     private boolean isActive;
     private String paymentName;
-    List<OrderDetail> orderDetailList;
+    List<OrderDetailDTO> orderDetailList;
 }

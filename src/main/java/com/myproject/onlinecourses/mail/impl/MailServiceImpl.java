@@ -47,6 +47,8 @@ public class MailServiceImpl implements MailService {
 
         return mail;
     }
+
+
     @Override
     public MimeMessage prepareMail(Mail mail){
         try{

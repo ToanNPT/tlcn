@@ -18,7 +18,7 @@ public class CouponDTO {
     private String description;
     private String type;
     private Double value;
-    private String expiredDate;
+    private Date expiredDate;
     private Date startDate;
     private Date createDate;
     private Date updateDate;

@@ -111,4 +111,18 @@ public class CouponServiceImpl implements CouponService {
         couponRepo.save(coupon.get());
         return new ResponseObject("", "200", "Active coupon successfully", null);
     }
+
+    @Override
+    public boolean isCouponValid(String code){
+        Optional<Coupon> coupon = couponRepo.findById(code);
+        if(!coupon.isPresent())
+            throw new NotFoundException("Not found coupon " + code);
+        Date now = new Date();
+        if(now.before(coupon.get().getStartDate()) || now.after(coupon.get().getExpiredDate())){
+            throw new RuntimeException("Coupon is not valid");
+        }
+        if(coupon.get().getNumberOfRemain() == 0)
+            throw new RuntimeException("Coupon is out of use");
+        return true;
+    }
 }

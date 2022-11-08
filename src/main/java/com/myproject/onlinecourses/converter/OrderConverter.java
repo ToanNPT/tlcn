@@ -4,9 +4,11 @@ import com.myproject.onlinecourses.dto.OrderDTO;
 import com.myproject.onlinecourses.dto.OrderDetailDTO;
 import com.myproject.onlinecourses.entity.Order;
 import com.myproject.onlinecourses.entity.OrderDetail;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
+@Mapper(componentModel = "spring")
 public interface OrderConverter {
     @Mappings({
             @Mapping(target = "username", source = "order.account.username"),
