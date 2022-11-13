@@ -9,6 +9,7 @@ import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.entity.Cart;
 import com.myproject.onlinecourses.entity.CartDetail;
 import com.myproject.onlinecourses.entity.Course;
+import com.myproject.onlinecourses.exception.DuplicateException;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.AccountRepository;
 import com.myproject.onlinecourses.repository.CartDetailRepository;
@@ -42,6 +43,13 @@ public class CartServiceImpl implements CartService {
     @Autowired
     CourseConverter courseConverter;
 
+    @Override
+    public ResponseObject getCartDetailById(Integer id){
+        Optional<CartDetail> cartDetail = cartDetailRepo.findById(id);
+        if(!cartDetail.isPresent())
+            throw new NotFoundException("Can not find cart detail by id "+ id);
+        return new ResponseObject(converter.entityToCartDetailDTO(cartDetail.get()));
+    }
 
     @Override
     public ResponseObject getByUsername(String username){
@@ -83,6 +91,11 @@ public class CartServiceImpl implements CartService {
         if(!cart.isPresent()) throw new NotFoundException("Can not found your cart : " + username);
         Optional<Course> course = coursesRepo.findById(courseId);
         if(!course.isPresent()) throw new NotFoundException("Can not found this course : " + courseId);
+
+        Optional<Course> foundCourse = cartRepo.checkExitedCourseInCart(courseId, username);
+        if(foundCourse.isPresent())
+            throw new DuplicateException("course is exited in your cart");
+
         CartDetail cartDetail = new CartDetail();
         cartDetail.setCart(cart.get());
         cartDetail.setCourse(course.get());

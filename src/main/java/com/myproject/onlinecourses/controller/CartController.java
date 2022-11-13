@@ -26,4 +26,10 @@ public class CartController {
                                @PathVariable("courseId") String courseId){
         return cartService.add(username, courseId);
     }
+
+    @GetMapping("cart-detail/{id}")
+    public ResponseObject getCartDetailById(@PathVariable("id") Integer id){
+        return cartService.getCartDetailById(id);
+    }
+
 }
