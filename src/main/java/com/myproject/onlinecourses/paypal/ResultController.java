@@ -1,5 +1,10 @@
 package com.myproject.onlinecourses.paypal;
 
+import com.myproject.onlinecourses.entity.Order;
+import com.myproject.onlinecourses.mail.Mail;
+import com.myproject.onlinecourses.mail.MailService;
+import com.myproject.onlinecourses.repository.AccountRepository;
+import com.myproject.onlinecourses.repository.OrderRepository;
 import com.myproject.onlinecourses.service.OrderService;
 import com.myproject.onlinecourses.utils.Utils;
 import com.paypal.api.payments.Payment;
@@ -11,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Optional;
+
 import static com.myproject.onlinecourses.paypal.PaypalController.URL_PAYPAL_CANCEL;
 
 @Controller
@@ -20,6 +27,15 @@ public class ResultController {
     OrderService orderService;
     @Autowired
     PayPalService payPalService;
+
+    @Autowired
+    AccountRepository accountRepository;
+
+    @Autowired
+    OrderRepository orderRepository;
+
+    @Autowired
+    MailService mailService;
 
     private Logger log = LoggerFactory.getLogger(getClass());
 
@@ -36,6 +52,10 @@ public class ResultController {
             if(payment.getState().equals("approved")){
                 System.out.println(payment);
                 orderService.activeOrder(paymentId);
+                Optional<Order> order = orderRepository.findById(paymentId);
+                Mail mail = mailService.createConfirmOrderMail(order.get(),
+                        order.get().getAccount(), "CONFIRM ORDER");
+                mailService.sendMail(mail, "confirm-order-mail");
                 return "success";
             }
         } catch (PayPalRESTException e) {

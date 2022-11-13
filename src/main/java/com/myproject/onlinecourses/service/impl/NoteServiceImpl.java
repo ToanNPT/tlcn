@@ -36,6 +36,13 @@ public class NoteServiceImpl implements NoteService {
     NoteConverter converter;
 
     @Override
+    public ResponseObject getNoteById(Integer id){
+        Optional<Note> note = noteRepo.findById(id);
+        if(!note.isPresent())
+            throw new NotFoundException("Can not found note with id "+ id);
+        return new ResponseObject(converter.entityToDTO(note.get()));
+    }
+    @Override
     public ResponseObject getNotesByUsernameAndVideo(String username, Integer courseVideoId){
         List<Note> notes = noteRepo.getNotesByUsernameAnAndVideoId(username, courseVideoId);
         return new ResponseObject(notes);

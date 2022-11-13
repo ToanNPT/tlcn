@@ -13,6 +13,11 @@ public class NoteController {
     @Autowired
     NoteService noteService;
 
+    @GetMapping("note/{id}")
+    public ResponseObject getNoteById(@PathVariable("id") Integer id){
+        return noteService.getNoteById(id);
+    }
+
     @PostMapping("note/add")
     public ResponseObject addNote(@RequestBody NoteDTO dto){
         return noteService.addNote(dto);

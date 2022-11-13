@@ -13,6 +13,16 @@ public class CourseVideoController {
     @Autowired
     CourseVideoService courseVideoService;
 
+    @GetMapping("course-video/video/{id}")
+    public ResponseObject getById(@PathVariable("id") Integer id){
+        return courseVideoService.getCourseVideoById(id);
+    }
+
+    @GetMapping("course-video")
+    public ResponseObject getAll(){
+        return courseVideoService.getAll();
+    }
+
     @GetMapping("course-video/{courseId}")
     public ResponseObject getByCourseVideosId(@PathVariable("courseId") String id){
         return courseVideoService.getVideosByCourseId(id);

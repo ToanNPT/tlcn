@@ -7,6 +7,10 @@ import com.myproject.onlinecourses.dto.UploadVideoDTO;
 public interface CourseVideoService {
     ResponseObject getVideosByCourseId(String courseId);
 
+    ResponseObject getAll();
+
+    ResponseObject getCourseVideoById(Integer id);
+
     ResponseObject getVideosByChapter(String chapter);
 
     ResponseObject addNewVideo(UploadVideoDTO dto, String username, String courseId);

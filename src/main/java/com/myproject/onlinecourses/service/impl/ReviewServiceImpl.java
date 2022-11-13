@@ -40,6 +40,15 @@ public class ReviewServiceImpl implements ReviewService {
     CoursesRepository coursesRepo;
 
     @Override
+    public ResponseObject getById(Integer id){
+        Optional<Review> review = reviewRepo.findById(id);
+        if(!review.isPresent()){
+            throw new NotFoundException("Can not found review id "+ id);
+        }
+        return new ResponseObject(converter.entityToDto(review.get()));
+    }
+
+    @Override
     public ResponseObject getAll(Optional<Integer> page){
         Pageable pageable = PageRequest.of(page.orElse(0), 10);
         Page<Review> reviews =reviewRepo.findAll(pageable);

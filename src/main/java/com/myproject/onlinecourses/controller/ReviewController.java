@@ -17,6 +17,11 @@ public class ReviewController {
     @Autowired
     ReviewService reviewService;
 
+    @GetMapping("reviews/{id}")
+    public ResponseObject getById(@PathVariable("id") Integer id){
+        return reviewService.getById(id);
+    }
+
     @GetMapping("reviews")
     public ResponseObject getAll(@RequestParam("page")Optional<Integer> page){
         return reviewService.getAll(page);

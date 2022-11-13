@@ -46,6 +46,24 @@ public class CourseVideoServiceImpl implements CourseVideoService {
                 .collect(Collectors.toList()));
     }
 
+
+    @Override
+    public ResponseObject getAll(){
+        List<CoursesVideo> coursesVideoList = courseVideoRepo.findAll();
+        List<CourseVideoDTO> dtoList = coursesVideoList.stream()
+                .map(video -> converter.entityToDTO(video))
+                .collect(Collectors.toList());
+        return new ResponseObject(dtoList);
+    }
+
+    @Override
+    public ResponseObject getCourseVideoById(Integer id){
+        Optional<CoursesVideo> video = courseVideoRepo.findById(id);
+        if(!video.isPresent())
+            throw new NotFoundException("Can not found video " + id);
+        return new ResponseObject(converter.entityToDTO(video.get()));
+    }
+
     @Override
     public ResponseObject getVideosByChapter(String chapter){
         List<CoursesVideo> coursesVideos = courseVideoRepo.findAllByChapter(chapter);

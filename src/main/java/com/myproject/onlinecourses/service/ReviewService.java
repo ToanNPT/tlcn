@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public interface ReviewService  {
 
+    ResponseObject getById(Integer id);
+
     ResponseObject getAll(Optional<Integer> page);
 
     ResponseObject getByUsername(String username);

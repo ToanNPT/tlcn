@@ -1,6 +1,7 @@
 package com.myproject.onlinecourses.mail.impl;
 
 import com.myproject.onlinecourses.entity.Account;
+import com.myproject.onlinecourses.entity.Order;
 import com.myproject.onlinecourses.mail.Mail;
 import com.myproject.onlinecourses.mail.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,22 +43,35 @@ public class MailServiceImpl implements MailService {
         model.put("WEBSITE_NAME", "DEMO_TGDD");
         String url = "http://localhost:8080/api/v1/reset-password/" + token;
         model.put("resetUrl", url );
-
         mail.setModel(model);
-
         return mail;
     }
 
+    @Override
+    public Mail createConfirmOrderMail(Order order, Account account, String subject){
+        Mail mail = new Mail();
+        mail.setFrom(serverMail);
+        mail.setTo(account.getUserDetail().getEmail());
+        mail.setSubject(subject);
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("username", account.getUsername());
+        model.put("signature", "From FPT_TRAINING_HCMUTE");
+        model.put("WEBSITE_NAME", "DEMO_TGDD");
+        model.put("orderList", order.getOrderDetailList());
+        mail.setModel(model);
+        return mail;
+    }
 
     @Override
-    public MimeMessage prepareMail(Mail mail){
+    public MimeMessage prepareMail(Mail mail, String templatePath){
         try{
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message,
                     MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
             Context context = new Context();
             context.setVariables(mail.getModel());
-            String html = templateEngine.process("reset-password-mail", context);
+            String html = templateEngine.process(templatePath, context);
 
             helper.setTo(mail.getTo());
             helper.setFrom(mail.getFrom());
@@ -72,8 +86,8 @@ public class MailServiceImpl implements MailService {
 
     @Override
     @Async("mailExecutor")
-    public void sendMail(Mail mail){
-        MimeMessage message = prepareMail(mail);
+    public void sendMail(Mail mail, String templatePath){
+        MimeMessage message = prepareMail(mail, templatePath);
         javaMailSender.send(message);
     }
 }

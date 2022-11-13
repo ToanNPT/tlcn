@@ -208,7 +208,7 @@ public class AccountServiceImpl implements AccountService {
 
         tokenRepo.save(token);
         Mail prepareMail = mailService.createTokenMail(account.get(), "REQUEST RESET PASSWORD", valueToken);
-        mailService.sendMail(prepareMail);
+        mailService.sendMail(prepareMail, "reset-password-mail");
         return new ResponseObject("", "200", "Send reset mail successfully", null);
     }
 

@@ -4,6 +4,8 @@ import com.myproject.onlinecourses.dto.NoteDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
 
 public interface NoteService {
+    ResponseObject getNoteById(Integer id);
+
     ResponseObject getNotesByUsernameAndVideo(String username, Integer courseVideoId);
 
     ResponseObject getNotesByUsername(String username);

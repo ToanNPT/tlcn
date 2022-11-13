@@ -33,8 +33,8 @@ public class AccountController {
         return accountService.getAllAccount(page);
     }
 
-    @GetMapping("account")
-    public ResponseObject getAccountById(@RequestParam("id") String username ){
+    @GetMapping("account/{username}")
+    public ResponseObject getAccountById(@PathVariable("username") String username ){
         return accountService.getAccountById(username);
     }
 
