@@ -6,13 +6,11 @@ import com.myproject.onlinecourses.dto.CourseDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.dto.SearchCriteria;
 import com.myproject.onlinecourses.dto.UploadCourse;
-import com.myproject.onlinecourses.entity.Account;
-import com.myproject.onlinecourses.entity.Category;
-import com.myproject.onlinecourses.entity.Course;
-import com.myproject.onlinecourses.entity.Course_;
+import com.myproject.onlinecourses.entity.*;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.AccountRepository;
 import com.myproject.onlinecourses.repository.CategoryRepository;
+import com.myproject.onlinecourses.repository.CoursePaidRepository;
 import com.myproject.onlinecourses.repository.CoursesRepository;
 import com.myproject.onlinecourses.service.CoursesService;
 import com.myproject.onlinecourses.specification.CoursesSpecification;
@@ -54,6 +52,9 @@ public class CoursesServiceImpl implements CoursesService {
 
     @Value("${amazonProperties.avatarCourse.bucketName}")
     private String avatarBucket;
+
+    @Autowired
+    CoursePaidRepository coursePaidRepo;
 
     @Override
     public ResponseObject getById(String id){
@@ -139,16 +140,17 @@ public class CoursesServiceImpl implements CoursesService {
 
     @Override
     public ResponseObject checkPurchaseCourse(String username, String courseId){
-        String purchaseCourse = coursesRepo.checkPurchaseCourse(username, courseId);
+        Optional<CoursePaid> purchaseCourse = coursePaidRepo.isPaid(courseId, username);
 
-        if(purchaseCourse != null)
+        if(purchaseCourse.isPresent())
             return new ResponseObject(true);
         return new ResponseObject(false);
     }
 
     @Override
     public ResponseObject getListPurchasedCourse(String username){
-        List<String> listPurchasedCourses = coursesRepo.getListPurchasedCourse(username);
-        return new ResponseObject(listPurchasedCourses.toString());
+        List<CoursePaid> listPurchasedCourses = coursePaidRepo.getCoursesPaidByUsername(username);
+        return new ResponseObject(listPurchasedCourses.stream()
+                .map((coursePaid -> coursePaid.getCourse().getId())));
     }
 }
