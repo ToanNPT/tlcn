@@ -13,16 +13,17 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CoursePaid {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "user_name")
-    private String username;
+    @ManyToOne
+    @JoinColumn(name = "username")
+    private Account account;
 
-    @Column(name = "course_id")
-    private String courseId;
+    @ManyToOne()
+    @JoinColumn(name = "course_id")
+    private Course course;
 
     @Column(name = "buy_date")
     private Date buyDate;

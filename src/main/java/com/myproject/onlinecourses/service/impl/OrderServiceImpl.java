@@ -43,6 +43,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     AccountRepository accountRepo;
 
+    @Autowired
+    CoursePaidRepository coursePaidRepo;
+
     @Override
     public OrderDTO addOrder(RequestOrder dto){
         return null;
@@ -121,6 +124,21 @@ public class OrderServiceImpl implements OrderService {
         if(!order.isPresent())
             throw new NotFoundException("Can not found order");
         order.get().setActive(true);
+
+        Account account = order.get().getAccount();
+        List<CoursePaid> coursePaidList = new ArrayList<>();
+        for(OrderDetail item: order.get().getOrderDetailList()){
+            CoursePaid coursePaid = new CoursePaid();
+            Course course = item.getCourse();
+            coursePaid.setCourse(course);
+            coursePaid.setAccount(account);
+            coursePaid.setBuyDate(order.get().getCreateDate());
+            coursePaidList.add(coursePaid);
+
+            course.setNumStudents(course.getNumStudents() + 1);
+            coursesRepo.save(course);
+        }
+        coursePaidRepo.saveAll(coursePaidList);
         orderRepo.save(order.get());
     }
 
@@ -131,6 +149,4 @@ public class OrderServiceImpl implements OrderService {
             throw new NotFoundException("Can not found order");
         orderRepo.delete(order.get());
     }
-
-
 }
