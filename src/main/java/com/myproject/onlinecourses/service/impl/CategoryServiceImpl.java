@@ -8,11 +8,16 @@ import com.myproject.onlinecourses.exception.DuplicateException;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.CategoryRepository;
 import com.myproject.onlinecourses.service.CategoryService;
+import com.myproject.onlinecourses.utils.PaginationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,11 +29,17 @@ public class CategoryServiceImpl implements CategoryService {
     CategoryConverter converter;
 
     @Override
-    public ResponseObject getAll(){
-        List<Category> categories = categoryRepo.findAllByActive(true);
+    public ResponseObject getAll(Optional<Integer> page, Optional<Integer> limit ){
+        Pageable pageable = PageRequest.of(page.orElse(0), limit.orElse(20));
+        Page<Category> categories = categoryRepo.findAllByActive(pageable, true);
 
-        return new ResponseObject(categories.stream().map(c -> converter.entityToDTO(c))
-                .collect(Collectors.toList()));
+        Page<CategoryDTO> dtos = categories.map(new Function<Category, CategoryDTO>() {
+            @Override
+            public CategoryDTO apply(Category category) {
+                return converter.entityToDTO(category);
+            }
+        });
+        return new ResponseObject(dtos);
     }
 
     @Override

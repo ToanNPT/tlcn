@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/v1/")
 public class CategoryController {
@@ -15,8 +17,9 @@ public class CategoryController {
     CategoryService categoryService;
 
     @GetMapping("categories")
-    public ResponseObject getAll(){
-        return categoryService.getAll();
+    public ResponseObject getAll(@RequestParam("page") Optional<Integer> page,
+                                 @RequestParam("limit") Optional<Integer> limit){
+        return categoryService.getAll(page, limit);
     }
 
     @GetMapping("category/{id}")
