@@ -107,7 +107,7 @@ public class CoursesServiceImpl implements CoursesService {
         course.setNumStudents(0);
         course.setAvatar(url);
         course.setCategory(category.get());
-        course.setUpdateDate(new Date());
+        course.setCreateDate(new Date());
         course.setUpdateDate(null);
 
         Course res = coursesRepo.save(course);
