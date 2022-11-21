@@ -100,6 +100,7 @@ public class CouponServiceImpl implements CouponService {
         Coupon entity  = converter.dtoToEntity(dto);
         entity.setCreateDate(new Date());
         entity.setAccount(account.get());
+        entity.setActive(true);
         Coupon res = couponRepo.save(entity);
         return new ResponseObject(converter.entityToDTO(res));
     }
