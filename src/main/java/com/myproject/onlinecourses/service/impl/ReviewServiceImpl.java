@@ -49,7 +49,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ResponseObject getAll(Optional<Integer> page){
-        Pageable pageable = PageRequest.of(page.orElse(0), 10);
+        Pageable pageable = PageRequest.of(page.orElse(0), 10, Sort.by("createDate").descending());
         Page<Review> reviews =reviewRepo.findAll(pageable);
         Page<ReviewDTO> dtos = reviews.map(new Function<Review, ReviewDTO>() {
             @Override
