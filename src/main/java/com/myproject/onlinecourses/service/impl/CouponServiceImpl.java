@@ -11,9 +11,15 @@ import com.myproject.onlinecourses.repository.AccountRepository;
 import com.myproject.onlinecourses.repository.CouponRepository;
 import com.myproject.onlinecourses.service.CouponService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,22 +35,18 @@ public class CouponServiceImpl implements CouponService {
     AccountRepository accountRepo;
 
     @Override
-    public ResponseObject getAllCoupon(){
-        List<Coupon> couponList  = couponRepo.findAll();
-        Collections.sort(couponList, new Comparator<Coupon>() {
+    public ResponseObject getAllCoupon(Optional<Integer> page, Optional<Integer> limit){
+        Pageable pageable = PageRequest.of(page.orElse(0), limit.orElse(10), Sort.by("createDate").descending());
+        Page<Coupon> coupons = couponRepo.findAll(pageable);
+
+//        List<Coupon> couponList  = couponRepo.findAll();
+
+        Page<CouponDTO> dtos = coupons.map(new Function<Coupon, CouponDTO>() {
             @Override
-            public int compare(Coupon o1, Coupon o2) {
-                if(o1.getCreateDate().equals(o2.getCreateDate()))
-                    return 0;
-                else if(o1.getCreateDate().after(o2.getCreateDate()))
-                    return -1;
-                else
-                    return 1;
+            public CouponDTO apply(Coupon coupon) {
+                return converter.entityToDTO(coupon);
             }
         });
-        List<CouponDTO> dtos = couponList.stream()
-                .map(c -> converter.entityToDTO(c))
-                .collect(Collectors.toList());
         return new ResponseObject(dtos);
     }
 

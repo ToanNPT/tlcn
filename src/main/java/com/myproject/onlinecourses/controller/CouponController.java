@@ -7,6 +7,8 @@ import com.myproject.onlinecourses.service.CouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/v1/")
 public class CouponController {
@@ -14,8 +16,9 @@ public class CouponController {
     CouponService couponService;
 
     @GetMapping("coupons")
-    public ResponseObject getAll(){
-        return couponService.getAllCoupon();
+    public ResponseObject getAll(@RequestParam("page") Optional<Integer> page,
+                                 @RequestParam("limit")Optional<Integer> limit) {
+        return couponService.getAllCoupon(page, limit);
     }
 
     @GetMapping("coupon/{code}")
