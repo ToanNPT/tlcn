@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -76,20 +77,13 @@ public class ReviewServiceImpl implements ReviewService {
         Optional<Course> course = coursesRepo.findById(id);
         if(!course.isPresent())
             throw new NotFoundException("course " + id + " is not found");
-        Pageable pageable = PageRequest.of(page.orElse(0), 10 );
+        Pageable pageable = PageRequest.of(page.orElse(0), 10, Sort.by("createDate").descending());
         Page<Review> reviews = reviewRepo.findByCourse_Id(id, pageable );
 
         Page<ReviewDTO> reviewDTOS = reviews.map(new Function<Review, ReviewDTO>() {
             @Override
             public ReviewDTO apply(Review review) {
                 return converter.entityToDto(review);
-            }
-        });
-
-        Collections.sort(reviewDTOS.toList(), new Comparator<ReviewDTO>() {
-            @Override
-            public int compare(ReviewDTO o1, ReviewDTO o2) {
-                return o1.getCreateDate().compareTo(o2.getCreateDate());
             }
         });
         return new ResponseObject(reviewDTOS);
