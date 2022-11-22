@@ -172,8 +172,6 @@ public class CoursesServiceImpl implements CoursesService {
         if(dto.getLanguage() != null && dto.getLanguage() != course.getLanguage()){
             course.setLanguage(dto.getLanguage());
         }
-        if(dto.isActive() != course.isActive())
-            course.setActive(dto.isActive());
 
         if(dto.isPublic()){
             course.setPublic(true);
