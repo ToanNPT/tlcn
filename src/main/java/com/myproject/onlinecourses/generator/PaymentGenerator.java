@@ -19,7 +19,7 @@ public class PaymentGenerator implements IdentifierGenerator {
         try {
             Connection connection = session.connection();
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select count(id) from courses");
+            ResultSet resultSet = statement.executeQuery("select count(id) from payment");
             if(resultSet.next()) {
                 Integer id = resultSet.getInt(1) + 1;
                 SUFFIX = id.toString();
