@@ -9,10 +9,15 @@ import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.PaymentRepository;
 import com.myproject.onlinecourses.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,11 +29,16 @@ public class PaymentServiceImpl implements PaymentService {
     PaymentConverter converter;
 
     @Override
-    public ResponseObject getAll(){
-        List<Payment> payments = paymentRepo.findAllByActive(true);
-        return new ResponseObject(payments.stream()
-                .map(p -> converter.entityToDTO(p))
-                .collect(Collectors.toList()));
+    public ResponseObject getAll(Optional<Integer> page, Optional<Integer> limit){
+        Pageable pageable = PageRequest.of(page.orElse(0), limit.orElse(10), Sort.by("name").ascending());
+        Page<Payment> payments = paymentRepo.findAllByActive(true, pageable);
+        Page<PaymentDTO> dtos = payments.map(new Function<Payment, PaymentDTO>() {
+            @Override
+            public PaymentDTO apply(Payment payment) {
+                return converter.entityToDTO(payment);
+            }
+        });
+        return new ResponseObject(dtos);
     }
 
     @Override

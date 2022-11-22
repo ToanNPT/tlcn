@@ -19,8 +19,9 @@ public class PaymentController {
     PaymentService paymentService;
 
     @GetMapping("payments")
-    public ResponseObject getAll(){
-        return paymentService.getAll();
+    public ResponseObject getAll(@RequestParam("page") Optional<Integer> page,
+                                 @RequestParam("limit") Optional<Integer> limit){
+        return paymentService.getAll(page, limit);
     }
 
     @GetMapping("payment/{id}")

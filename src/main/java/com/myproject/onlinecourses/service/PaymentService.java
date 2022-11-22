@@ -3,8 +3,10 @@ package com.myproject.onlinecourses.service;
 import com.myproject.onlinecourses.dto.PaymentDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
 
+import java.util.Optional;
+
 public interface PaymentService {
-    ResponseObject getAll();
+    ResponseObject getAll(Optional<Integer> page, Optional<Integer> limit);
 
     ResponseObject getById(String id);
 
