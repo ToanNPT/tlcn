@@ -1,6 +1,5 @@
 package com.myproject.onlinecourses.service.impl;
 
-import com.amazonaws.services.s3.transfer.Upload;
 import com.myproject.onlinecourses.aws.AwsS3Service;
 import com.myproject.onlinecourses.converter.CourseConverter;
 import com.myproject.onlinecourses.dto.CourseDTO;
@@ -15,23 +14,19 @@ import com.myproject.onlinecourses.repository.CoursePaidRepository;
 import com.myproject.onlinecourses.repository.CoursesRepository;
 import com.myproject.onlinecourses.service.CoursesService;
 import com.myproject.onlinecourses.specification.CoursesSpecification;
-import com.myproject.onlinecourses.utils.FilterParam;
 import com.myproject.onlinecourses.utils.PaginationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class CoursesServiceImpl implements CoursesService {
@@ -153,23 +148,23 @@ public class CoursesServiceImpl implements CoursesService {
     }
 
     public Course validateAndUpdateInput(String id, UploadCourse dto, Course course){
-        if(dto.getName() != course.getName() && dto.getName() != null)
+        if(dto.getName() != null && !dto.getName().equals(course.getName()))
             course.setName(dto.getName());
         if(dto.getPrice() != null && Double.parseDouble(dto.getPrice()) != course.getPrice())
             course.setPrice(Double.parseDouble(dto.getPrice()));
-        if(dto.getCategory() != null && dto.getCategory() != course.getCategory().getId()){
+        if(dto.getCategory() != null && !dto.getCategory().equals(course.getCategory().getId())){
             Optional<Category> category = categoryRepos.findById(dto.getCategory());
             course.setCategory(category.get());
         }
-        if(!dto.getAvatar().isEmpty()){
+        if(dto.getAvatar() != null && !dto.getAvatar().isEmpty()){
             String filename = course.getName() + "_" + course.getId() + dto.getName();
             String url = awsS3Service.uploadSingleFile(avatarBucket, filename, dto.getAvatar() );
             course.setAvatar(url);
         }
-        if(dto.getDescription() != null && dto.getDescription() != course.getDescription()){
+        if(dto.getDescription() != null && !dto.getDescription().equals(course.getDescription())){
             course.setDescription(dto.getDescription());
         }
-        if(dto.getLanguage() != null && dto.getLanguage() != course.getLanguage()){
+        if(dto.getLanguage() != null && !dto.getLanguage().equals(course.getLanguage())){
             course.setLanguage(dto.getLanguage());
         }
 
@@ -181,7 +176,6 @@ public class CoursesServiceImpl implements CoursesService {
             else
                 course.setPublic(dto.isPublic());
         }
-
 
         course.setUpdateDate(new Date());
         return coursesRepo.save(course);
