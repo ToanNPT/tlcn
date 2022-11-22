@@ -22,7 +22,7 @@ public interface CoursesService {
 
     ResponseObject delete(String courseId);
 
-    ResponseObject update(String id, CourseDTO dto);
+    ResponseObject update(String id, UploadCourse dto);
 
     ResponseObject checkPurchaseCourse(String username, String courseId);
 

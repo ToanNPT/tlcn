@@ -53,8 +53,9 @@ public class CoursesController {
 
     }
 
-    @PutMapping("course/update/{id}")
-    public ResponseObject update(@PathVariable("id") String id, @RequestBody CourseDTO dto){
+    @PutMapping(value = "course/update/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseObject update(@PathVariable("id") String id,
+                                 @ModelAttribute UploadCourse dto){
         return coursesService.update(id, dto);
     }
 

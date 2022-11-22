@@ -1,5 +1,6 @@
 package com.myproject.onlinecourses.service.impl;
 
+import com.amazonaws.services.s3.transfer.Upload;
 import com.myproject.onlinecourses.aws.AwsS3Service;
 import com.myproject.onlinecourses.converter.CourseConverter;
 import com.myproject.onlinecourses.dto.CourseDTO;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class CoursesServiceImpl implements CoursesService {
@@ -109,7 +111,7 @@ public class CoursesServiceImpl implements CoursesService {
         course.setCategory(category.get());
         course.setCreateDate(new Date());
         course.setUpdateDate(null);
-
+        course.setActive(true);
         Course res = coursesRepo.save(course);
         return new ResponseObject(converter.entityToCourseDTO(res));
     }
@@ -126,16 +128,12 @@ public class CoursesServiceImpl implements CoursesService {
     }
 
     @Override
-    public ResponseObject update(String id, CourseDTO dto){
+    public ResponseObject update(String id, UploadCourse dto){
         Optional<Course> c = coursesRepo.findById(id);
         if(!c.isPresent()) throw new NotFoundException("Can not found course");
 
-        Course updateEntity = converter.courseDtoToEntity(dto);
-        updateEntity.setId(id);
-        updateEntity.setAccount(c.get().getAccount());
-        updateEntity.setNumStudents(dto.getNumStudents());
-        Course res = coursesRepo.save(updateEntity);
-        return new ResponseObject("", "200", "Update successful", converter.entityToCourseDTO(res));
+        Course updated = validateAndUpdateInput(id, dto, c.get());
+        return new ResponseObject("", "200", "Update successful", converter.entityToCourseDTO(updated));
     }
 
     @Override
@@ -152,5 +150,37 @@ public class CoursesServiceImpl implements CoursesService {
         List<CoursePaid> listPurchasedCourses = coursePaidRepo.getCoursesPaidByUsername(username);
         return new ResponseObject(listPurchasedCourses.stream()
                 .map((coursePaid -> coursePaid.getCourse().getId())));
+    }
+
+    public Course validateAndUpdateInput(String id, UploadCourse dto, Course course){
+        if(dto.getName() != course.getName() && dto.getName() != null)
+            course.setName(dto.getName());
+        if(dto.getPrice() != null && Double.parseDouble(dto.getPrice()) != course.getPrice())
+            course.setPrice(Double.parseDouble(dto.getPrice()));
+        if(dto.getCategory() != null && dto.getCategory() != course.getCategory().getId()){
+            Optional<Category> category = categoryRepos.findById(dto.getCategory());
+            course.setCategory(category.get());
+        }
+        if(!dto.getAvatar().isEmpty()){
+            String filename = course.getName() + "_" + course.getId() + dto.getName();
+            String url = awsS3Service.uploadSingleFile(avatarBucket, filename, dto.getAvatar() );
+            course.setAvatar(url);
+        }
+        if(dto.getDescription() != null && dto.getDescription() != course.getDescription()){
+            course.setDescription(dto.getDescription());
+        }
+        if(dto.getLanguage() != null && dto.getLanguage() != course.getLanguage()){
+            course.setLanguage(dto.getLanguage());
+        }
+        if(dto.isActive() != course.isActive())
+            course.setActive(dto.isActive());
+
+        if(dto.isPublic()){
+            course.setPublic(true);
+            course.setPrice(0);
+        }
+
+        course.setUpdateDate(new Date());
+        return coursesRepo.save(course);
     }
 }
