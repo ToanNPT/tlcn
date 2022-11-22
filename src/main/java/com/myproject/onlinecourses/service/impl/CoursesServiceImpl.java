@@ -173,10 +173,15 @@ public class CoursesServiceImpl implements CoursesService {
             course.setLanguage(dto.getLanguage());
         }
 
-        if(dto.isPublic()){
-            course.setPublic(true);
-            course.setPrice(0);
+        if(dto.isPublic() != course.isPublic()){
+            if(dto.isPublic()){
+                course.setPublic(true);
+                course.setPrice(0);
+            }
+            else
+                course.setPublic(dto.isPublic());
         }
+
 
         course.setUpdateDate(new Date());
         return coursesRepo.save(course);
