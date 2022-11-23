@@ -5,6 +5,7 @@ import com.myproject.onlinecourses.mail.Mail;
 import com.myproject.onlinecourses.mail.MailService;
 import com.myproject.onlinecourses.repository.AccountRepository;
 import com.myproject.onlinecourses.repository.OrderRepository;
+import com.myproject.onlinecourses.service.CoursePaidService;
 import com.myproject.onlinecourses.service.OrderService;
 import com.myproject.onlinecourses.utils.Utils;
 import com.paypal.api.payments.Payment;
@@ -37,6 +38,9 @@ public class ResultController {
     @Autowired
     MailService mailService;
 
+    @Autowired
+    CoursePaidService coursePaidService;
+
     private Logger log = LoggerFactory.getLogger(getClass());
 
     @GetMapping("/pay/cancel")
@@ -52,6 +56,7 @@ public class ResultController {
             if(payment.getState().equals("approved")){
                 System.out.println(payment);
                 orderService.activeOrder(paymentId);
+
                 Optional<Order> order = orderRepository.findById(paymentId);
                 Mail mail = mailService.createConfirmOrderMail(order.get(),
                         order.get().getAccount(), "CONFIRM ORDER");

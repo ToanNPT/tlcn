@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -141,10 +142,17 @@ public class CoursesServiceImpl implements CoursesService {
     }
 
     @Override
-    public ResponseObject getListPurchasedCourse(String username){
-        List<CoursePaid> listPurchasedCourses = coursePaidRepo.getCoursesPaidByUsername(username);
-        return new ResponseObject(listPurchasedCourses.stream()
-                .map((coursePaid -> coursePaid.getCourse().getId())));
+    public ResponseObject getListPurchasedCourse(String username, Optional<Integer> page,
+                                                 Optional<Integer> limit){
+        Pageable pageable = PageRequest.of(page.orElse(0), limit.orElse(20), Sort.by("buyDate").descending());
+        Page<Course> list = coursePaidRepo.getListCoursePaidByUsername(username, pageable);
+        Page<CourseDTO> dtoList = list.map(new Function<Course, CourseDTO>() {
+            @Override
+            public CourseDTO apply(Course course) {
+                return converter.entityToCourseDTO(course);
+            }
+        });
+        return new ResponseObject(dtoList);
     }
 
     public Course validateAndUpdateInput(String id, UploadCourse dto, Course course){

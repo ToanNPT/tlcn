@@ -64,8 +64,6 @@ public class PaypalController {
                 sum = sum - discount;
         }
 
-
-
         try {
             Payment payment = paypalService.createPayment(
                     sum,

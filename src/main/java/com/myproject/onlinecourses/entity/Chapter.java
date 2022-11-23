@@ -34,6 +34,4 @@ public class Chapter {
 
     @Column(name = "next_chapter_id")
     private int nextChapterId;
-
-
 }

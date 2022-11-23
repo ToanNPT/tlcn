@@ -8,6 +8,7 @@ import com.myproject.onlinecourses.entity.Course;
 import com.myproject.onlinecourses.repository.CoursesRepository;
 import com.myproject.onlinecourses.service.CoursesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.integration.IntegrationGraphEndpoint;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,8 +67,10 @@ public class CoursesController {
     }
 
     @GetMapping("listPurchasedCourses/{username}")
-    public ResponseObject getListPurchasedCourses(@PathVariable("username") String username){
-        return coursesService.getListPurchasedCourse(username);
+    public ResponseObject getListPurchasedCourses(@PathVariable("username") String username,
+                                                  @RequestParam("page") Optional<Integer> page,
+                                                  @RequestParam("limit") Optional<Integer> limit){
+        return coursesService.getListPurchasedCourse(username, page, limit);
     }
 
 }
