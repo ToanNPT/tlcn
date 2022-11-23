@@ -24,4 +24,9 @@ public interface ChapterRepository extends JpaRepository<Chapter, Integer> {
             "from Chapter as c " +
             "where c.nextChapterId = :nextId and c.course.id = :courseId")
     Optional<Chapter> getChapterByNextId(String courseId, int nextId);
+
+    @Query("select count(c) " +
+            "from Chapter as c " +
+            "where c.course.id = :courseId")
+    Integer countChaptersInCourse(String courseId);
 }

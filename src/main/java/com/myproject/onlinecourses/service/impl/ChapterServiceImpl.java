@@ -13,7 +13,6 @@ import com.myproject.onlinecourses.service.ChapterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,7 +79,8 @@ public class ChapterServiceImpl implements ChapterService {
         updateChap.get().setCourse(course.get());
         updateChap.get().setChapterName(dto.getChapterName());
 
-        if(dto.getNextChapterId() == updateChap.get().getNextChapterId()){
+        int chapterSize = chapterRepo.countChaptersInCourse(dto.getCourseId());
+        if(chapterSize == 1 || dto.getNextChapterId() == updateChap.get().getNextChapterId()){
             Chapter updated = chapterRepo.save(updateChap.get());
             return new ResponseObject(converter.entityToDTO(updated));
         }
@@ -95,6 +95,11 @@ public class ChapterServiceImpl implements ChapterService {
         Optional<Chapter> found = chapterRepo.findById(chapterId);
         if(!found.isPresent())
             throw new NotFoundException("Can not found chapter");
+        List<Chapter> chapters = chapterRepo.getChaptersByCourseId(found.get().getCourse().getId());
+        if(chapters.size() == 1){
+            chapterRepo.delete(found.get());
+            return new ResponseObject("", "200", "Delete successful", null);
+        }
         if(found.get().isHeadChapter()){
             if(found.get().getNextChapterId() == -1){
                 chapterRepo.delete(found.get());
