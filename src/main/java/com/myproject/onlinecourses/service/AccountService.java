@@ -3,6 +3,7 @@ package com.myproject.onlinecourses.service;
 import com.myproject.onlinecourses.dto.*;
 import com.myproject.onlinecourses.exception.DuplicateException;
 import com.myproject.onlinecourses.security.Roles;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -15,7 +16,9 @@ public interface AccountService {
 
     ResponseObject deleteAccount(String username);
 
-    ResponseObject updateAccount(String username, AccountDetailDTO dto) throws DuplicateException;
+    ResponseObject updateAvatar(String username, MultipartFile file);
+
+    ResponseObject updateAccount(String username, UpdateInforForm dto) throws DuplicateException;
 
     ResponseObject getAccountDetail(String username);
 

@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,11 +51,12 @@ public class AccountController {
     }
 
     @PutMapping("account/{username}")
-    public ResponseObject updateAccount(@Validated @PathVariable("username") String username,
-                                        @RequestBody AccountDetailDTO accountDetailDTO, BindingResult bindingResult ) throws DuplicateException {
+    public ResponseObject updateAccount(@PathVariable("username") String username,
+                                        @Validated @RequestBody UpdateInforForm form,
+                                        BindingResult bindingResult ) throws DuplicateException {
         if(bindingResult.hasErrors())
             throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
-        return accountService.updateAccount(username, accountDetailDTO);
+        return accountService.updateAccount(username, form);
     }
 
     @GetMapping("account/detail/{username}")
@@ -97,7 +99,18 @@ public class AccountController {
     }
 
     @PostMapping(value = "account/users/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseObject insertUserAccount(@ModelAttribute RegisterAccountForm dto){
+    public ResponseObject insertUserAccount(@Validated @ModelAttribute RegisterAccountForm dto, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
+        }
         return accountService.saveAccount(dto, Roles.USER);
     }
+
+    @PostMapping(value = "account/{username}/avatar", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseObject updateAvatar(@PathVariable("username") String username,
+                                       @RequestParam("file") MultipartFile file){
+        return accountService.updateAvatar(username, file);
+    }
+
+
 }

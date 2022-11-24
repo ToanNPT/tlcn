@@ -98,8 +98,10 @@ public class CoursesSpecification implements Specification<Course> {
                 predicates.add(criteriaBuilder.between(root.get(criteria.getKey()), min, max));
             }
         }
-        Predicate or = criteriaBuilder.or(orPredicates.toArray(new Predicate[0]));
-        predicates.add(or);
+        if(orPredicates.size() != 0){
+            Predicate or = criteriaBuilder.or(orPredicates.toArray(new Predicate[0]));
+            predicates.add(or);
+        }
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
 }

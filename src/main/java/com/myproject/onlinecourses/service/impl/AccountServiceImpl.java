@@ -27,10 +27,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Function;
 
 @Service
@@ -113,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
         UserDetail userDetail = accountConvert.registerFormToUserDetail(register);
         account.setUserDetail(userDetail);
 
-        if(!register.getAvatar().isEmpty()){
+        if(register.getAvatar() != null){
             String filename  = "avatar" + "-" + register.getUsername();
             String url = awsS3Service.uploadSingleFile(bucketname, filename, register.getAvatar());
             userDetail.setAvatar(url);
@@ -151,21 +153,36 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ResponseObject updateAccount(String username, AccountDetailDTO dto) throws DuplicateException {
-        Optional<Account> account = accountRepository.findById(dto.getUsername());
+    public ResponseObject updateAvatar(String username, MultipartFile file){
+        Optional<Account> account = accountRepository.findById(username);
+        if(!account.isPresent())
+            throw new NotFoundException("Can not found account");
+        String filename = "avatar" + "-" + username + new Date();
+        String url = awsS3Service.uploadSingleFile(bucketname, filename, file);
+        account.get().getUserDetail().setAvatar(url);
+        Account updated = accountRepository.save(account.get());
+        return new ResponseObject(updated.getUserDetail().getAvatar());
+    }
+    @Override
+    public ResponseObject updateAccount(String username, UpdateInforForm dto) throws DuplicateException {
+        Optional<Account> account = accountRepository.findById(username);
         if(!account.isPresent()){
             throw new NotFoundException("account " + username + " is not found");
         }
         UserDetail userDetail = userDetailRepository.findById(username).get();
 
         Optional<UserDetail> duplicated = userDetailRepository.findFirstByPhoneOrEmailOrUsername(dto.getPhone(),
-                dto.getEmail(), dto.getUsername());
+                dto.getEmail(), username);
         if(!duplicated.isPresent()){
             throw new DuplicateException("mail, phone or username already existed");
         }
 
-        userDetail.setEmail(dto.getEmail());
-        userDetail.setBirthdate(dto.getBirthdate());
+        if(dto.getEmail() != null && dto.getEmail() != userDetail.getEmail())
+            userDetail.setEmail(dto.getEmail());
+
+        if(dto.getBirthdate() != null)
+            userDetail.setBirthdate(dto.getBirthdate());
+
         userDetail.setGender(dto.getGender());
         userDetail.setFullname(dto.getFullname());
         userDetail.setPhone(dto.getPhone());
