@@ -3,7 +3,8 @@ package com.myproject.onlinecourses.security;
 public enum Roles {
     ADMIN("ADMIN"),
     USER("USER"),
-    GUEST("GUEST");
+    GUEST("GUEST"),
+    TEACHER("TEACHER");
 
     public final String value;
 

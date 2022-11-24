@@ -1,5 +1,6 @@
 package com.myproject.onlinecourses.service.impl;
 
+import com.myproject.onlinecourses.aws.AwsS3Service;
 import com.myproject.onlinecourses.controller.SecurityController;
 import com.myproject.onlinecourses.converter.AccountConvert;
 import com.myproject.onlinecourses.dto.*;
@@ -10,9 +11,11 @@ import com.myproject.onlinecourses.exception.NotMatchException;
 import com.myproject.onlinecourses.mail.Mail;
 import com.myproject.onlinecourses.mail.MailService;
 import com.myproject.onlinecourses.repository.*;
+import com.myproject.onlinecourses.security.Roles;
 import com.myproject.onlinecourses.service.AccountService;
 import com.myproject.onlinecourses.utils.Generator;
 import com.myproject.onlinecourses.utils.TokenConstants;
+import com.myproject.onlinecourses.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -51,8 +54,6 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     CartRepository cartRepo;
 
-    @Value("${account.get-all.size}")
-    int getAllSize;
 
     @Autowired
     TokenRepository tokenRepo;
@@ -63,9 +64,17 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     MailService mailService;
 
+    @Autowired
+    AwsS3Service awsS3Service;
+
+    @Value("${amazonProperties.avatarUser.bucketName}")
+    String bucketname;
+
+
+
     @Override
     public ResponseObject getAllAccount(Optional<Integer> page){
-        Pageable pageable = PageRequest.of(page.orElse(0), getAllSize);
+        Pageable pageable = PageRequest.of(page.orElse(0), 10);
         Page<Account> accountList = accountRepository.findAll(pageable);
         Page<AccountDTO> accountDTOS = accountList.map(new Function<Account, AccountDTO>() {
             @Override
@@ -87,35 +96,42 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ResponseObject saveAccount(AccountDetailDTO accountDetailDTO) throws DuplicateException {
-        Optional<UserDetail> check = userDetailRepository.findFirstByPhoneOrEmailOrUsername(accountDetailDTO.getPhone(), accountDetailDTO.getEmail(),
-                accountDetailDTO.getUsername());
+    public ResponseObject saveAccount(RegisterAccountForm register, Roles role) throws DuplicateException {
+        Optional<UserDetail> check = userDetailRepository.findFirstByPhoneOrEmailOrUsername(register.getPhone(), register.getEmail(),
+                register.getUsername());
 
         if(check.isPresent()){
             throw new DuplicateException("your mail or phone existed");
         }
 
-        Account account = accountConvert.accountDetailToAccount(accountDetailDTO);
-        UserDetail userDetail = accountConvert.accountDetailToUserDetail(accountDetailDTO);
-        Optional<Role> role = roleRepository.findById(accountDetailDTO.getRole());
+        Optional<Role> roleModel = roleRepository.findRoleByName(role.value);
+        Account account = new Account();
+        account.setUsername(register.getUsername());
+        account.setPassword(passwordEncoder.encode(register.getPassword()));
+        account.setRole(roleModel.get());
 
-        if(account == null || userDetail == null || !role.isPresent()){
-            throw new RuntimeException("Some error occurred when creating account");
+        UserDetail userDetail = accountConvert.registerFormToUserDetail(register);
+        account.setUserDetail(userDetail);
+
+        if(!register.getAvatar().isEmpty()){
+            String filename  = "avatar" + "-" + register.getUsername();
+            String url = awsS3Service.uploadSingleFile(bucketname, filename, register.getAvatar());
+            userDetail.setAvatar(url);
+        }
+        else{
+            String url = Utils.randomAvatarUser(register.getGender());
+            userDetail.setAvatar(url);
         }
 
-        String hashPwd = passwordEncoder.encode(accountDetailDTO.getPassword());
-
-        account.setRole(role.get());
-        account.setPassword(hashPwd);
-        userDetail.setUsername(account.getUsername());
-        account.setUserDetail(userDetail);
+//        if(account == null || userDetail == null || !role.isPresent()){
+//            throw new RuntimeException("Some error occurred when creating account");
+//        }
 
         Cart yourCart = new Cart();
         //yourCart.setAccount(savedAccount);
-        yourCart.setUsername(accountDetailDTO.getUsername());
+        yourCart.setUsername(register.getUsername());
         yourCart.setTotalPrice(0);
         yourCart.setPaymentPrice(0);
-
         yourCart.setAccount(account);
         account.setCart(yourCart);
 
@@ -234,5 +250,4 @@ public class AccountServiceImpl implements AccountService {
         tokenRepo.delete(found.get());
         return new ResponseObject("", "200", "Reset password successful", null);
     }
-
 }

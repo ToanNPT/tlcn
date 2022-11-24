@@ -12,7 +12,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDetail {
-
     @Id
     @Column(name = "user_name")
     private String  username;
@@ -32,6 +31,9 @@ public class UserDetail {
 
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "avatar")
+    private String avatar;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_name")

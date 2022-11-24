@@ -2,6 +2,7 @@ package com.myproject.onlinecourses.converter;
 
 import com.myproject.onlinecourses.dto.AccountDTO;
 import com.myproject.onlinecourses.dto.AccountDetailDTO;
+import com.myproject.onlinecourses.dto.RegisterAccountForm;
 import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.entity.UserDetail;
 import org.mapstruct.Mapper;
@@ -42,7 +43,8 @@ public interface AccountConvert {
             @Mapping(target = "birthdate", source = "user.birthdate"),
             @Mapping(target = "gender", source = "user.gender"),
             @Mapping(target = "email", source = "user.email"),
-            @Mapping(target = "phone", source = "user.phone")
+            @Mapping(target = "phone", source = "user.phone"),
+            @Mapping(target = "avatar", source = "user.avatar")
     })
     AccountDetailDTO mergerAccountDetail(Account account, UserDetail user);
 
@@ -53,9 +55,20 @@ public interface AccountConvert {
             @Mapping(target = "birthdate", source = "account.userDetail.birthdate"),
             @Mapping(target = "gender", source = "account.userDetail.gender"),
             @Mapping(target = "email", source = "account.userDetail.email"),
-            @Mapping(target = "phone", source = "account.userDetail.phone")
+            @Mapping(target = "phone", source = "account.userDetail.phone"),
+            @Mapping(target = "avatar", source = "account.userDetail.avatar")
     }
     )
     AccountDetailDTO accountToDetail(Account account);
 
+    @Mappings({
+            @Mapping(target = "username", source = "dto.username"),
+            @Mapping(target = "fullname", source = "dto.fullname"),
+            @Mapping(target = "birthdate", source = "dto.birthdate"),
+            @Mapping(target = "gender", source = "dto.gender"),
+            @Mapping(target = "email", source = "dto.email"),
+            @Mapping(target = "phone", source = "dto.phone"),
+            @Mapping(target = "avatar", ignore = true)
+    })
+    UserDetail registerFormToUserDetail(RegisterAccountForm dto);
 }

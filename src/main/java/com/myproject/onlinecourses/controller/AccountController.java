@@ -1,13 +1,12 @@
 package com.myproject.onlinecourses.controller;
 
-import com.myproject.onlinecourses.dto.AccountDetailDTO;
-import com.myproject.onlinecourses.dto.ChangePassword;
-import com.myproject.onlinecourses.dto.ResetPass;
-import com.myproject.onlinecourses.dto.ResponseObject;
+import com.myproject.onlinecourses.dto.*;
 import com.myproject.onlinecourses.exception.DuplicateException;
 import com.myproject.onlinecourses.exception.NotFoundException;
+import com.myproject.onlinecourses.security.Roles;
 import com.myproject.onlinecourses.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -38,12 +37,12 @@ public class AccountController {
         return accountService.getAccountById(username);
     }
 
-    @PostMapping("account")
-    public ResponseObject saveAccount(@Validated @RequestBody AccountDetailDTO dto, BindingResult bindingResult) throws DuplicateException {
-        if(bindingResult.hasErrors())
-            throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
-        return accountService.saveAccount(dto);
-    }
+//    @PostMapping("account")
+//    public ResponseObject saveAccount(@Validated @RequestBody AccountDetailDTO dto, BindingResult bindingResult) throws DuplicateException {
+//        if(bindingResult.hasErrors())
+//            throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
+//        return accountService.saveAccount(dto);
+//    }
 
     @DeleteMapping("account/{username}")
     public ResponseObject deleteAccount(@PathVariable("username") String username){
@@ -95,5 +94,10 @@ public class AccountController {
             throw new NotFoundException("Token is not found");
         return accountService.resetPassword(token.get(), dto);
 
+    }
+
+    @PostMapping(value = "account/users/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseObject insertUserAccount(@ModelAttribute RegisterAccountForm dto){
+        return accountService.saveAccount(dto, Roles.USER);
     }
 }

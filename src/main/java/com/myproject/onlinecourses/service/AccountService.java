@@ -1,10 +1,8 @@
 package com.myproject.onlinecourses.service;
 
-import com.myproject.onlinecourses.dto.AccountDetailDTO;
-import com.myproject.onlinecourses.dto.ChangePassword;
-import com.myproject.onlinecourses.dto.ResetPass;
-import com.myproject.onlinecourses.dto.ResponseObject;
+import com.myproject.onlinecourses.dto.*;
 import com.myproject.onlinecourses.exception.DuplicateException;
+import com.myproject.onlinecourses.security.Roles;
 
 import java.util.Optional;
 
@@ -13,7 +11,7 @@ public interface AccountService {
 
     ResponseObject getAccountById(String username);
 
-    ResponseObject saveAccount(AccountDetailDTO accountDetailDTO) throws DuplicateException;
+    ResponseObject saveAccount(RegisterAccountForm register, Roles role) throws DuplicateException;
 
     ResponseObject deleteAccount(String username);
 
