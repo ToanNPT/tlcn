@@ -83,7 +83,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/v1/account").hasAnyAuthority(Roles.ADMIN.value, Roles.USER.value)
                 .antMatchers(HttpMethod.POST, "/api/v1/account").hasAuthority(Roles.ADMIN.value)
                 .antMatchers(HttpMethod.GET, "/ai/v1/logout").hasAnyAuthority(Roles.ADMIN.value, Roles.USER.value)
+                .antMatchers(HttpMethod.POST, "/api/v1/account/users/register").permitAll()
                 .anyRequest().permitAll();
+
 
         http.addFilter(new JwtAuthenticationFilter(authenticationManagerBean(), new JwtProvider(),accountRepo ));
         http.addFilter(new JWTAuthorizationFilter(authenticationManagerBean(), userDetailsService));
