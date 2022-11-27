@@ -21,17 +21,19 @@ public class UploadController {
     @Autowired
     ResourceCourseService resoureService;
 
-    @RequestMapping(path = "video/upload/{username}/{courseId}", method = RequestMethod.POST,
+    @RequestMapping(path = "video/upload/{username}/courses/{courseId}/chapters/{chapterId}",
+            method = RequestMethod.POST,
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseObject uploadVideo(@PathVariable("username") String username,
                                       @PathVariable("courseId") String courseId,
+                                      @PathVariable("chapterId") Integer chapterId,
                                       @ModelAttribute UploadVideoDTO dto,
                                       HttpServletRequest request){
         String principal = request.getUserPrincipal().getName();
         if(!principal.equals(username)){
             return new ResponseObject("400", "200", "Dont have permission", null);
         }
-        return service.addNewVideo(dto, principal, courseId);
+        return service.addNewVideo(dto, principal, courseId, chapterId);
     }
 
     @PostMapping(path = "resource/upload/{username}/{courseId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

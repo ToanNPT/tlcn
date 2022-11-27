@@ -1,18 +1,16 @@
 package com.myproject.onlinecourses.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
-@Getter
-@Setter
+import java.util.Date;
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadVideoDTO {
+public class UpdateInforVideo {
     private String title;
     private String description;
     private int nextVideoId;
-    private MultipartFile video;
 }

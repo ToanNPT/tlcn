@@ -17,8 +17,9 @@ public class CoursesVideo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "chapter")
-    private String chapter;
+    @ManyToOne()
+    @JoinColumn(name = "chapter_id")
+    private Chapter chapter;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", referencedColumnName = "id", nullable = false)
@@ -41,4 +42,10 @@ public class CoursesVideo {
 
     @Column(name = "update_date")
     private Date updateDate;
+
+    @Column(name = "next_videoId")
+    private int nextVideoId;
+
+    @Column(name = "is_head_video")
+    private boolean isHeadVideo;
 }

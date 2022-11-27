@@ -12,7 +12,8 @@ public interface CourseVideoConverter {
 
     @Mappings({
             @Mapping(target = "courseId", source = "course.id"),
-            @Mapping(target = "active", source = "active")
+            @Mapping(target = "active", source = "active"),
+            @Mapping(target = "chapterId", source = "chapter.id")
     })
     public CourseVideoDTO entityToDTO(CoursesVideo entity);
 

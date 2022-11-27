@@ -29,4 +29,9 @@ public interface ChapterRepository extends JpaRepository<Chapter, Integer> {
             "from Chapter as c " +
             "where c.course.id = :courseId")
     Integer countChaptersInCourse(String courseId);
+
+    @Query("select c " +
+            "from Chapter as c " +
+            "where c.id = :id")
+    Optional<Chapter> findById(Integer id);
 }

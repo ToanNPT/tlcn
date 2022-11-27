@@ -2,6 +2,7 @@ package com.myproject.onlinecourses.controller;
 
 import com.myproject.onlinecourses.dto.CourseVideoDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
+import com.myproject.onlinecourses.dto.UpdateInforVideo;
 import com.myproject.onlinecourses.service.CourseVideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +29,9 @@ public class CourseVideoController {
         return courseVideoService.getVideosByCourseId(id);
     }
 
-    @GetMapping("course-video/chapter/{name}")
-    public ResponseObject getCourseVideosByChapter(@PathVariable("name") String chapter){
-        return courseVideoService.getVideosByChapter(chapter);
+    @GetMapping("course-video/chapter/{chapterId}")
+    public ResponseObject getCourseVideosByChapter(@PathVariable("chapterId") Integer chapterId){
+        return courseVideoService.getVideosByChapter(chapterId);
     }
 
     @DeleteMapping("course-video/{id}")
@@ -40,7 +41,9 @@ public class CourseVideoController {
 
     @PutMapping("course-video/edit-info/{id}")
     public ResponseObject updateInfor(@PathVariable("id") Integer id,
-                                      @RequestBody CourseVideoDTO dto){
+                                      @RequestBody UpdateInforVideo dto){
         return courseVideoService.updateInfoVideo(id, dto);
     }
+
+
 }
