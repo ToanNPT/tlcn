@@ -14,9 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 import static com.myproject.onlinecourses.paypal.PaypalController.URL_PAYPAL_CANCEL;
@@ -44,12 +49,18 @@ public class ResultController {
     private Logger log = LoggerFactory.getLogger(getClass());
 
     @GetMapping("/pay/cancel")
-    public String cancelPay(){
-        return "cancel";
+    public void cancelPay(HttpServletResponse res){
+        try {
+            res.sendRedirect("http://localhost:3000/purcharse/fail");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @GetMapping("/pay/success")
-    public String successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId){
+    public void successPay(@RequestParam("paymentId") String paymentId,
+                             @RequestParam("PayerID") String payerId,
+                             HttpServletResponse res) throws IOException {
         try {
             Payment payment = payPalService.executePayment(paymentId, payerId);
             log.info("Access to uri success " + payment);
@@ -61,11 +72,33 @@ public class ResultController {
                 Mail mail = mailService.createConfirmOrderMail(order.get(),
                         order.get().getAccount(), "CONFIRM ORDER");
                 mailService.sendMail(mail, "confirm-order-mail");
-                return "success";
+                res.sendRedirect("http://localhost:3000/purcharse/success");
             }
-        } catch (PayPalRESTException e) {
+        } catch (PayPalRESTException | IOException e) {
             //log.error(e.getMessage());
+            res.sendRedirect("http://localhost:3000/purcharse/fail");
         }
-        return "redirect:/";
+    }
+
+    @GetMapping("test/order")
+    public String testHtml( Model model){
+        Optional<Order> order = orderRepository.findById("PAYID-MN5OOOQ43771141XK6013813");
+
+        model.addAttribute("username", order.get().getAccount().getUserDetail().getFullname());
+        model.addAttribute("signature", "From FPT_TRAINING_HCMUTE");
+        model.addAttribute("WEBSITE_NAME", "OnlineCourses");
+        model.addAttribute("total", order.get().getTotalPrice());
+        System.out.println(order.get().getTotalPrice() - order.get().getPaymentPrice());
+        model.addAttribute("discount", String.format("%.2f", order.get().getTotalPrice() - order.get().getPaymentPrice()));
+        model.addAttribute("paymentPrice", order.get().getPaymentPrice());
+        model.addAttribute("orderList",order.get().getOrderDetailList());
+        SimpleDateFormat formate = new SimpleDateFormat("yyyy-MM-dd");
+        model.addAttribute("order_date", formate.format(order.get().getCreateDate()));
+        model.addAttribute("orderId", order.get().getId());
+        model.addAttribute("payment_type", order.get().getPayment().getName());
+        model.addAttribute("user", order.get().getAccount().getUsername());
+        model.addAttribute("fullname", order.get().getAccount().getUserDetail().getFullname());
+
+        return "confirm-order-mail";
     }
 }

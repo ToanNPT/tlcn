@@ -16,6 +16,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,10 +56,21 @@ public class MailServiceImpl implements MailService {
         mail.setSubject(subject);
 
         Map<String, Object> model = new HashMap<>();
-        model.put("username", account.getUsername());
+        model.put("username", order.getAccount().getUserDetail().getFullname());
         model.put("signature", "From FPT_TRAINING_HCMUTE");
-        model.put("WEBSITE_NAME", "DEMO_TGDD");
-        model.put("orderList", order.getOrderDetailList());
+        model.put("WEBSITE_NAME", "OnlineCourses");
+        model.put("total", order.getTotalPrice());
+        System.out.println(order.getTotalPrice() - order.getPaymentPrice());
+        model.put("discount", String.format("%.2f", order.getTotalPrice() - order.getPaymentPrice()));
+        model.put("paymentPrice", order.getPaymentPrice());
+        model.put("orderList",order.getOrderDetailList());
+        SimpleDateFormat formate = new SimpleDateFormat("yyyy-MM-dd");
+        model.put("order_date", formate.format(order.getCreateDate()));
+        model.put("orderId", order.getId());
+        model.put("payment_type", order.getPayment().getName());
+        model.put("user", order.getAccount().getUsername());
+        model.put("fullname", order.getAccount().getUserDetail().getFullname());
+
         mail.setModel(model);
         return mail;
     }

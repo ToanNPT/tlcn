@@ -78,9 +78,13 @@ public class CoursesServiceImpl implements CoursesService {
 
     @Override
     public ResponseObject filterCourses(List<SearchCriteria> conditions){
+
         CoursesSpecification specification = new CoursesSpecification(categoryRepos);
+
         for(SearchCriteria criteria : conditions){
-            specification.add(criteria);
+            //System.out.println(criteria.getValue().equals(""));
+            if(!criteria.getValue().equals(""))
+                specification.add(criteria);
         }
         List<Course> courses = coursesRepo.findAll(specification);
         List<CourseDTO> courseDTOS = courses.stream()
