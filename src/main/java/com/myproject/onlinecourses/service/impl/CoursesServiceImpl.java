@@ -77,7 +77,8 @@ public class CoursesServiceImpl implements CoursesService {
     }
 
     @Override
-    public ResponseObject filterCourses(List<SearchCriteria> conditions){
+    public ResponseObject filterCourses(List<SearchCriteria> conditions, Optional<Integer> page,
+                                        Optional<Integer> limit){
 
         CoursesSpecification specification = new CoursesSpecification(categoryRepos);
 
@@ -86,10 +87,15 @@ public class CoursesServiceImpl implements CoursesService {
             if(!criteria.getValue().equals(""))
                 specification.add(criteria);
         }
-        List<Course> courses = coursesRepo.findAll(specification);
-        List<CourseDTO> courseDTOS = courses.stream()
-                .map(c -> converter.entityToCourseDTO(c)).collect(Collectors.toList());
-        return new ResponseObject(courseDTOS);
+        Pageable pageable = PageRequest.of(page.orElse(0), limit.orElse(10));
+        Page<Course> courses = coursesRepo.findAll(specification, pageable);
+        Page<CourseDTO> dtos = courses.map(new Function<Course, CourseDTO>() {
+            @Override
+            public CourseDTO apply(Course course) {
+                return converter.entityToCourseDTO(course);
+            }
+        });
+        return new ResponseObject(dtos);
     }
 
     @Override

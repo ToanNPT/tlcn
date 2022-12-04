@@ -16,7 +16,8 @@ public interface CoursesService {
 
     ResponseObject getAll(Optional<Integer> page);
 
-    ResponseObject filterCourses(List<SearchCriteria> conditions);
+    ResponseObject filterCourses(List<SearchCriteria> conditions,
+                                 Optional<Integer> page, Optional<Integer> limit);
 
     ResponseObject saveCourse(UploadCourse dto);
 

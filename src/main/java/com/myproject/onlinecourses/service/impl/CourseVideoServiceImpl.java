@@ -214,7 +214,7 @@ public class CourseVideoServiceImpl implements CourseVideoService {
         else {
             Optional<CoursesVideo> nextVideo = courseVideoRepo.findById(video.getNextVideoId());
             if(!nextVideo.isPresent())
-                throw new NotFoundException("Can not found next chapter");
+                throw new NotFoundException("Can not found next video");
             if(nextVideo.get().isHeadVideo()){
                 nextVideo.get().setHeadVideo(false);
                 video.setHeadVideo(true);

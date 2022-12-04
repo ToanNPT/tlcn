@@ -34,8 +34,11 @@ public class CoursesController {
     }
 
     @PostMapping("courses/search")
-    public ResponseObject filterProduct(@RequestBody List<SearchCriteria> conditions){
-        return coursesService.filterCourses(conditions);
+    public ResponseObject filterProduct(
+            @RequestParam("page") Optional<Integer> page,
+            @RequestParam("limit") Optional<Integer> limit,
+            @RequestBody List<SearchCriteria> conditions){
+        return coursesService.filterCourses(conditions, page, limit);
     }
 
 //    @PostMapping(value = "course/add")
