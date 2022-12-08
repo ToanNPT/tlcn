@@ -149,4 +149,33 @@ public class OrderServiceImpl implements OrderService {
             throw new NotFoundException("Can not found order");
         orderRepo.delete(order.get());
     }
+
+    @Override
+    public double calcPaymentPrice(RequestOrder dto){
+
+        Optional<Coupon> coupon = couponRepo.findByCode(dto.getCouponCode());
+
+        double sum = dto.getOrderDetailList().stream()
+                .reduce(0.0, (sub, el) -> sub + el.getPrice(), Double::sum);
+
+        if(coupon.isPresent()){
+            double discount = coupon.get().getValue();
+            String type = coupon.get().getType();
+            if(type.equals("%"))
+                sum = sum - sum*(discount/100);
+            else
+                sum = sum - discount;
+        }
+        return sum;
+    }
+
+    @Override
+    public boolean checkInforFromVnpay(String vnp_txtRef, String vnp_amount){
+        Optional<Order> order = orderRepo.findById(vnp_txtRef);
+        if(!order.isPresent())
+            return false;
+        if(order.get().getPaymentPrice() == Double.valueOf(Integer.valueOf(vnp_amount)/100))
+            return true;
+        return false;
+    }
 }

@@ -50,19 +50,7 @@ public class PaypalController {
         if(!isValid)
             return new ResponseObject("500", "200", "something error", null);
 
-        Optional<Coupon> coupon = couponRepo.findByCode(dto.getCouponCode());
-
-        double sum = dto.getOrderDetailList().stream()
-                .reduce(0.0, (sub, el) -> sub + el.getPrice(), Double::sum);
-
-        if(coupon.isPresent()){
-            double discount = coupon.get().getValue();
-            String type = coupon.get().getType();
-            if(type == "%")
-                sum = sum + sum*(discount/100);
-            else
-                sum = sum - discount;
-        }
+        double sum = orderService.calcPaymentPrice(dto);
 
         try {
             Payment payment = paypalService.createPayment(

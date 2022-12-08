@@ -14,4 +14,8 @@ public interface OrderService {
     void activeOrder(String orderId);
 
     void deleteUnActiveorder(String orderId);
+
+    double calcPaymentPrice(RequestOrder dto);
+
+    boolean checkInforFromVnpay(String vnp_txtRef, String vnp_amount);
 }
