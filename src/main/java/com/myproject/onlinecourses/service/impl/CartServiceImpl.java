@@ -18,6 +18,7 @@ import com.myproject.onlinecourses.repository.CoursesRepository;
 import com.myproject.onlinecourses.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -105,6 +106,21 @@ public class CartServiceImpl implements CartService {
         cart.get().setPaymentPrice(total);
         cartRepo.save(cart.get());
         return new ResponseObject(converter.entityToCartDetailDTO(res));
+    }
+
+    @Override
+    @Transactional
+    public void deleteFromOrder(String username, List<String> idCourses){
+        StringBuilder builder = new StringBuilder();
+//        builder.append("(");
+        for(String id : idCourses){
+            builder.append( "'" + id + "', ");
+        }
+        builder.delete(builder.length() - 3, builder.length() -1);
+        builder.deleteCharAt(0);
+        String params = builder.toString().trim();
+
+        cartRepo.deleteItemInCartByListCourseId(username, params);
     }
 
 }

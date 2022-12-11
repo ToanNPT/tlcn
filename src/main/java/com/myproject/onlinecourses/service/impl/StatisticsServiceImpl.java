@@ -2,13 +2,16 @@ package com.myproject.onlinecourses.service.impl;
 
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.dto.RevenuesByMonth;
+import com.myproject.onlinecourses.dto.RevenuesInMonth;
 import com.myproject.onlinecourses.interfaceMapping.IRevenuesByInYear;
+import com.myproject.onlinecourses.interfaceMapping.IRevenuesInMonth;
 import com.myproject.onlinecourses.repository.StatisticsRepository;
 import com.myproject.onlinecourses.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,5 +35,16 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
 
         return new ResponseObject(resultList);
+    }
+
+    @Override
+    public ResponseObject statisticRevenuesInMonth(Integer year, Integer month){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month -1);
+
+        int maxDays = calendar.getActualMaximum(Calendar.MONTH);
+        List<IRevenuesInMonth> inMonth = repository.getRevenuesInMonth(year, month);
+        return new ResponseObject(inMonth);
     }
 }

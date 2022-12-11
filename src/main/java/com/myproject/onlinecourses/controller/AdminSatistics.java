@@ -16,4 +16,10 @@ public class AdminSatistics {
     public ResponseObject getRevenuesInYear(@PathVariable("year") String year){
         return service.getRevenuesInYear(year);
     }
+    @GetMapping("reports/revenues/{year}/{month}")
+    public ResponseObject getRevenuesInMonth(@PathVariable("year") Integer year,
+                                             @PathVariable("month") Integer month){
+        return service.statisticRevenuesInMonth(year, month);
+    }
+
 }

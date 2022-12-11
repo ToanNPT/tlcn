@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.myproject.onlinecourses.dto.RequestOrder;
 import com.myproject.onlinecourses.dto.ResponseObject;
 
+import com.myproject.onlinecourses.repository.CartRepository;
 import com.myproject.onlinecourses.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,9 @@ public class VnPayController {
 
     @Autowired
     OrderService orderService;
+
+    @Autowired
+    CartRepository cartRepository;
 
     @PostMapping("vnpay/request-pay")
     public ResponseEntity<?> requestPayment(@RequestBody RequestOrder orderForm,

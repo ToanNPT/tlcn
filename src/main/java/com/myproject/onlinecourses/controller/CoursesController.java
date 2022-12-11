@@ -5,14 +5,19 @@ import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.dto.SearchCriteria;
 import com.myproject.onlinecourses.dto.UploadCourse;
 import com.myproject.onlinecourses.entity.Course;
+import com.myproject.onlinecourses.exception.ForbiddenException;
 import com.myproject.onlinecourses.repository.CoursesRepository;
 import com.myproject.onlinecourses.service.CoursesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.integration.IntegrationGraphEndpoint;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,4 +81,12 @@ public class CoursesController {
         return coursesService.getListPurchasedCourse(username, page, limit);
     }
 
+    @PostMapping("courses/{courseId}/enroll-publiccourse")
+    public ResponseObject enrollPublicCourse(@PathVariable("courseId") String courseId,
+                                             Principal principal){
+        if(principal == null)
+            throw new ForbiddenException();
+        String user = principal.getName();
+        return coursesService.enrollPublicCourse(user, courseId);
+    }
 }

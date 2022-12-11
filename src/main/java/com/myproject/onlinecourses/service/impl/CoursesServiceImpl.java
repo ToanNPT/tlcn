@@ -198,4 +198,27 @@ public class CoursesServiceImpl implements CoursesService {
         course.setUpdateDate(new Date());
         return coursesRepo.save(course);
     }
+
+
+    @Override
+    public ResponseObject enrollPublicCourse(String username, String courseId){
+        Optional<Course> course = coursesRepo.findById(courseId);
+        if(!course.isPresent())
+            throw new NotFoundException("Can not found course");
+        if(!course.get().isPublic())
+            throw new RuntimeException("The course must be paid before learning");
+        course.get().setNumStudents(course.get().getNumStudents() + 1);
+
+        Optional<Account> account = accountRepository.findById(username);
+        coursesRepo.save(course.get());
+
+        CoursePaid paid = new CoursePaid();
+        paid.setCourse(course.get());
+        paid.setBuyDate(new Date());
+        paid.setAccount(account.get());
+
+        coursePaidRepo.save(paid);
+        return new ResponseObject(converter.entityToCourseDTO(course.get()));
+    }
+
 }

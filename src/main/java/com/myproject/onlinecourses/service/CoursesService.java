@@ -28,4 +28,6 @@ public interface CoursesService {
     ResponseObject checkPurchaseCourse(String username, String courseId);
 
     ResponseObject getListPurchasedCourse(String username, Optional<Integer> page, Optional<Integer> limit);
+
+    ResponseObject enrollPublicCourse(String username, String courseId);
 }

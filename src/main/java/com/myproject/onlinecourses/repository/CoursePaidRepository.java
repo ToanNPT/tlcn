@@ -25,4 +25,9 @@ public interface CoursePaidRepository extends JpaRepository<CoursePaid, Integer>
             "from CoursePaid as c " +
             "where c.account.username = :username")
     Page<Course> getListCoursePaidByUsername(String username, Pageable pageable);
+
+    @Query("select c.course.id " +
+            "from CoursePaid as c " +
+            "where c.account.username = :username")
+    List<String> getIdsCoursePaidByUsername(String username);
 }

@@ -1,9 +1,12 @@
 package com.myproject.onlinecourses.vnPay;
 
 import com.fasterxml.jackson.annotation.OptBoolean;
+import com.myproject.onlinecourses.entity.CartDetail;
 import com.myproject.onlinecourses.entity.Order;
 import com.myproject.onlinecourses.mail.Mail;
 import com.myproject.onlinecourses.mail.MailService;
+import com.myproject.onlinecourses.repository.CartDetailRepository;
+import com.myproject.onlinecourses.repository.CartRepository;
 import com.myproject.onlinecourses.repository.OrderRepository;
 import com.myproject.onlinecourses.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/v1/")
@@ -33,6 +38,9 @@ public class VnPayCallBack {
 
     @Autowired
     OrderRepository orderRepository;
+
+    @Autowired
+    CartDetailRepository cartDetailRepo;
 
 
     @GetMapping("vnpay/payment/return")
@@ -56,9 +64,7 @@ public class VnPayCallBack {
 
             String status = req.getParameter("vnp_ResponseCode");
             if (status.equals("00")) {
-                orderService.activeOrder(vnp_TxnRef);
-                //redirect to success payment page
-
+                orderService.handleActiveOrder(vnp_TxnRef);
                 Optional<Order> order = orderRepository.findById(vnp_TxnRef);
                 Mail mail = mailService.createConfirmOrderMail(order.get(), order.get().getAccount(), "CONFIRM ORDER");
                 mailService.sendMail(mail, "confirm-order-mail");

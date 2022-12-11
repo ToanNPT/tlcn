@@ -18,4 +18,6 @@ public interface OrderService {
     double calcPaymentPrice(RequestOrder dto);
 
     boolean checkInforFromVnpay(String vnp_txtRef, String vnp_amount);
+
+    void handleActiveOrder(String orderId);
 }

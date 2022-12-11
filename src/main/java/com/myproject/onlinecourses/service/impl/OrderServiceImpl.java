@@ -2,10 +2,12 @@ package com.myproject.onlinecourses.service.impl;
 
 import com.myproject.onlinecourses.converter.OrderConverter;
 import com.myproject.onlinecourses.dto.OrderDTO;
+import com.myproject.onlinecourses.dto.OrderDetailDTO;
 import com.myproject.onlinecourses.dto.RequestOrder;
 import com.myproject.onlinecourses.entity.*;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.*;
+import com.myproject.onlinecourses.service.CartService;
 import com.myproject.onlinecourses.service.CouponService;
 import com.myproject.onlinecourses.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     CoursePaidRepository coursePaidRepo;
+
+    @Autowired
+    CartRepository cartRepository;
+
+    @Autowired
+    CartService cartService;
 
     @Override
     public OrderDTO addOrder(RequestOrder dto){
@@ -115,6 +123,23 @@ public class OrderServiceImpl implements OrderService {
         Optional<Payment> payment = paymentRepo.findById(dto.getPaymentId());
         if(!payment.isPresent())
             throw new NotFoundException("Payment is not valid");
+
+        List<String> paidList = coursePaidRepo.getIdsCoursePaidByUsername(dto.getUsername());
+        List<String> duplicated = dto.getOrderDetailList().stream()
+                .map(OrderDetailDTO::getCourseId)
+                .filter(paidList::contains)
+                .collect(Collectors.toList());
+        if(duplicated.size() != 0){
+            StringBuilder messError = new StringBuilder();
+            messError.append("Course with id ");
+            duplicated.forEach(p -> messError.append(p).append(", "));
+            if(duplicated.size()%2 == 0)
+                messError.append("were ");
+            else
+                messError.append("was ");
+            messError.append("bought before");
+            throw new RuntimeException(messError.toString());
+        }
         return true;
     }
 
@@ -177,5 +202,51 @@ public class OrderServiceImpl implements OrderService {
         if(order.get().getPaymentPrice() == Double.valueOf(Integer.valueOf(vnp_amount)/100))
             return true;
         return false;
+    }
+
+    @Override
+    public void handleActiveOrder(String orderId){
+        Optional<Order> order = orderRepo.findById(orderId);
+        if(!order.isPresent()){
+            throw new NotFoundException("Order not found");
+        }
+        if(order.get().isActive())
+            throw new RuntimeException("order was paid before");
+
+        order.get().setActive(true);
+        /*
+            decrease remain qty of coupon
+         */
+        if(order.get().getCoupon() != null){
+            int remainNum = order.get().getCoupon().getNumberOfRemain() -1;
+            order.get().getCoupon().setNumberOfRemain(remainNum);
+        }
+
+        /*
+            increase students in course
+         */
+        for(OrderDetail item : order.get().getOrderDetailList()){
+            int currentNum = item.getCourse().getNumStudents();
+            item.getCourse().setNumStudents(currentNum + 1);
+        }
+
+        /*
+            delete courses in user's cart
+         */
+
+        List<String> ids = order.get().getOrderDetailList().stream()
+                            .map(p -> p.getCourse().getId())
+                                .collect(Collectors.toList());
+        cartService.deleteFromOrder(order.get().getAccount().getUsername(), ids);
+
+        for(OrderDetail item : order.get().getOrderDetailList()){
+            CoursePaid paid = new CoursePaid();
+            paid.setAccount(item.getAccount());
+            paid.setCourse(item.getCourse());
+            paid.setBuyDate(new Date());
+            coursePaidRepo.save(paid);
+        }
+
+        orderRepo.save(order.get());
     }
 }
