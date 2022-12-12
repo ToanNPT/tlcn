@@ -33,7 +33,7 @@ public class Order {
     private double paymentPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_code", referencedColumnName = "code", nullable = false)
+    @JoinColumn(name = "coupon_code", referencedColumnName = "code", nullable = true)
     private Coupon coupon;
 
     @Column(name = "qty")

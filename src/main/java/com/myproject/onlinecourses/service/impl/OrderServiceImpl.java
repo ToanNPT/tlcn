@@ -110,15 +110,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public boolean checkRequestOrder(RequestOrder dto){
-        Optional<Coupon> coupon = couponRepo.findById(dto.getCouponCode());
-        if(!coupon.isPresent())
-            throw new NotFoundException("Not found coupon " +  dto.getCouponCode());
-        Date now = new Date();
-        if(now.before(coupon.get().getStartDate()) || now.after(coupon.get().getExpiredDate())){
-            throw new RuntimeException("Coupon is not valid");
+
+        if(dto.getCouponCode() != null && !dto.getCouponCode().equals("")){
+            Optional<Coupon> coupon = couponRepo.findById(dto.getCouponCode());
+            if(!coupon.isPresent())
+                throw new NotFoundException("Not found coupon " +  dto.getCouponCode());
+            Date now = new Date();
+            if(now.before(coupon.get().getStartDate()) || now.after(coupon.get().getExpiredDate())){
+                throw new RuntimeException("Coupon is not valid");
+            }
+            if(coupon.get().getNumberOfRemain() == 0)
+                throw new RuntimeException("Coupon is out of use");
         }
-        if(coupon.get().getNumberOfRemain() == 0)
-            throw new RuntimeException("Coupon is out of use");
+
 
         Optional<Payment> payment = paymentRepo.findById(dto.getPaymentId());
         if(!payment.isPresent())
