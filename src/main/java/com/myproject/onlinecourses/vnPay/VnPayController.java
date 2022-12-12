@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,9 +34,13 @@ public class VnPayController {
     CartRepository cartRepository;
 
     @PostMapping("vnpay/request-pay")
-    public ResponseEntity<?> requestPayment(@RequestBody RequestOrder orderForm,
+    public ResponseEntity<?> requestPayment(@Validated @RequestBody RequestOrder orderForm,
+                                         BindingResult bindingResult,
                                          HttpServletRequest request,
                                          HttpServletResponse res) throws UnsupportedEncodingException {
+
+        if(bindingResult.hasErrors())
+            throw new RuntimeException(bindingResult.getFieldError().getDefaultMessage());
 
         boolean isValid = orderService.checkRequestOrder(orderForm);
         if(!isValid)
