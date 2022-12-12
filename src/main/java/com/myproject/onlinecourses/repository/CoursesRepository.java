@@ -43,4 +43,9 @@ public interface CoursesRepository extends JpaRepository<Course, String>, JpaSpe
             "where c.isActive = true " +
             "order by c.createDate desc")
     Page<Course> findAll(Pageable pageable);
+
+    @Query("select c.price " +
+            "from Course as c " +
+            "where c.id = :id and c.isActive = true")
+    Double getPriceInCourse(String id);
 }

@@ -55,7 +55,7 @@ public class PaypalController {
         try {
             Payment payment = paypalService.createPayment(
                     sum,
-                    "VND",
+                    "USD",
                     PaypalPaymentMethod.paypal,
                     PaypalPaymentIntent.sale,
                     "Purchase online course",

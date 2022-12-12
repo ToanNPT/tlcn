@@ -59,11 +59,13 @@ public class OrderServiceImpl implements OrderService {
         return null;
     }
 
-
     @Override
     public Order addUnActiveOrder(String paymentId, RequestOrder dto){
-        double total = dto.getOrderDetailList().stream()
-                .reduce(0.0, (sub, el) -> sub + el.getPrice(), Double::sum);
+        double total = 0;
+        for(String id : dto.getOrderDetailList()){
+            Double price = coursesRepo.getPriceInCourse(id);
+            total += price;
+        }
         double paymentPrice = total;
 
         Optional<Account> account = accountRepo.findById(dto.getUsername());
@@ -94,9 +96,9 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> orderDetailList = dto.getOrderDetailList().stream()
                 .map(p -> {
                     OrderDetail detail = new OrderDetail();
-                    Optional<Course> course = coursesRepo.findById(p.getCourseId());
+                    Optional<Course> course = coursesRepo.findById(p.trim());
                     detail.setCourse(course.get());
-                    detail.setPrice(p.getPrice());
+                    detail.setPrice(course.get().getPrice());
                     detail.setAccount(account.get());
                     detail.setOrder(order);
                     return detail;
@@ -130,9 +132,9 @@ public class OrderServiceImpl implements OrderService {
 
         List<String> paidList = coursePaidRepo.getIdsCoursePaidByUsername(dto.getUsername());
         List<String> duplicated = dto.getOrderDetailList().stream()
-                .map(OrderDetailDTO::getCourseId)
                 .filter(paidList::contains)
                 .collect(Collectors.toList());
+
         if(duplicated.size() != 0){
             StringBuilder messError = new StringBuilder();
             messError.append("Course with id ");
@@ -184,8 +186,14 @@ public class OrderServiceImpl implements OrderService {
 
         Optional<Coupon> coupon = couponRepo.findByCode(dto.getCouponCode());
 
-        double sum = dto.getOrderDetailList().stream()
-                .reduce(0.0, (sub, el) -> sub + el.getPrice(), Double::sum);
+        double sum = 0;
+
+        for(String id : dto.getOrderDetailList()){
+            Optional<Course> course = coursesRepo.findById(id);
+            if(!course.isPresent())
+                throw new NotFoundException("Can not found course id" + id);
+            sum += course.get().getPrice();
+        }
 
         if(coupon.isPresent()){
             double discount = coupon.get().getValue();

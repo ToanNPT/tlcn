@@ -66,7 +66,7 @@ public class ResultController {
             log.info("Access to uri success " + payment);
             if(payment.getState().equals("approved")){
                 System.out.println(payment);
-                orderService.activeOrder(paymentId);
+                orderService.handleActiveOrder(paymentId);
 
                 Optional<Order> order = orderRepository.findById(paymentId);
                 Mail mail = mailService.createConfirmOrderMail(order.get(),

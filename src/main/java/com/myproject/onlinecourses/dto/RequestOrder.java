@@ -14,5 +14,5 @@ public class RequestOrder {
     private String username;
     private String couponCode;
     private String paymentId;
-    List<OrderDetailDTO> orderDetailList;
+    List<String> orderDetailList;
 }
