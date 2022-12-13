@@ -34,7 +34,7 @@ public class VnPayController {
     CartRepository cartRepository;
 
     @PostMapping("vnpay/request-pay")
-    public ResponseEntity<?> requestPayment(@Validated @RequestBody RequestOrder orderForm,
+    public ResponseObject requestPayment(@Validated @RequestBody RequestOrder orderForm,
                                          BindingResult bindingResult,
                                          HttpServletRequest request,
                                          HttpServletResponse res) throws UnsupportedEncodingException {
@@ -44,13 +44,13 @@ public class VnPayController {
 
         boolean isValid = orderService.checkRequestOrder(orderForm);
         if(!isValid)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("500", "200", "something error", null));
+            return new ResponseObject("500", "200", "something error", null);
 
         String orderId = Config.getRandomNumber(8);
         orderService.addUnActiveOrder(orderId, orderForm);
         String url = vnPayService.getUrlPay(request, orderForm, orderId);
 
-        return ResponseEntity.status(HttpStatus.OK).location(URI.create(url)).build();
+        return new ResponseObject(url);
     }
 
     //coming soon
