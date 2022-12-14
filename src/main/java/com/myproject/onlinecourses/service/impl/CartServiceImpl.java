@@ -111,16 +111,20 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void deleteFromOrder(String username, List<String> idCourses){
-        StringBuilder builder = new StringBuilder();
-//        builder.append("(");
+        Optional<Cart> cart = cartRepo.findById(username);
+        double deletedPriceSum = 0, total = cart.get().getTotalPrice();
+
         for(String id : idCourses){
-            builder.append( "'" + id + "', ");
+            cartDetailRepo.deleteByUsernameAndCourseId(username, id);
         }
-        builder.delete(builder.length() - 3, builder.length() -1);
-        builder.deleteCharAt(0);
-        String params = builder.toString().trim();
 
-        cartRepo.deleteItemInCartByListCourseId(username, params);
+        for(String id : idCourses){
+            Optional<Course> course = coursesRepo.findById(id);
+            deletedPriceSum += course.get().getPrice();
+        }
+
+        cart.get().setTotalPrice(total - deletedPriceSum);
+        cart.get().setPaymentPrice(total - deletedPriceSum);
+        cartRepo.save(cart.get());
     }
-
 }
