@@ -1,6 +1,7 @@
 package com.myproject.onlinecourses.service.impl;
 
 import com.myproject.onlinecourses.aws.AwsS3Service;
+import com.myproject.onlinecourses.converter.ChapterConverter;
 import com.myproject.onlinecourses.converter.CourseVideoConverter;
 import com.myproject.onlinecourses.dto.*;
 import com.myproject.onlinecourses.entity.Chapter;
@@ -36,26 +37,30 @@ public class CourseVideoServiceImpl implements CourseVideoService {
     @Autowired
     CourseVideoConverter converter;
 
+    @Autowired
+    ChapterConverter chapterConverter;
+
     @Value("${amazonProperties.videoBucket.bucketName}")
     private String bucketVideo;
 
     @Override
     public ResponseObject getVideosByCourseId(String courseId){
-        List<CoursesVideo> coursesVideo = courseVideoRepo.findAllByCourse_Id(courseId);
-        Collections.sort(coursesVideo, new Comparator<CoursesVideo>() {
-            @Override
-            public int compare(CoursesVideo o1, CoursesVideo o2) {
-                if(o1.getChapter().getId() > o2.getChapter().getId())
-                    return 1;
-                else if(o1.getChapter().getId() < o2.getChapter().getId())
-                    return -1;
-                else
-                    return 0;
-            }
-        });
-        return new ResponseObject(coursesVideo.stream()
-                .map(c -> converter.entityToDTO(c))
-                .collect(Collectors.toList()));
+        List<Chapter> chapters = chapterRepo.getChaptersByCourseId(courseId);
+        List<ChapterDTO> dtos = chapters.stream()
+                .map(p -> chapterConverter.entityToDTO(p))
+                .collect(Collectors.toList());
+
+        ChapterServiceImpl.sort(dtos);
+        List<CourseVideoDTO> videos = new ArrayList<>();
+        for(ChapterDTO dto : dtos){
+            List<CoursesVideo> videoInChapter = courseVideoRepo.getVideosByChapterId(dto.getId());
+            List<CourseVideoDTO> videoDTOS = videoInChapter.stream()
+                    .map(p -> converter.entityToDTO(p))
+                    .collect(Collectors.toList());
+            this.sort(videoDTOS);
+            videos.addAll(videoDTOS);
+        }
+        return new ResponseObject(videos);
     }
 
 

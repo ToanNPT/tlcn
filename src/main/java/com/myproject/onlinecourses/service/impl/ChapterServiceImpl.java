@@ -192,7 +192,7 @@ public class ChapterServiceImpl implements ChapterService {
         return setChapter(chapter);
     }
 
-    public void sort(List<ChapterDTO> chapters){
+    static public void sort(List<ChapterDTO> chapters){
         int index = 0, nextIndex = 1, size = chapters.size();
         while(index < size && index < size && nextIndex < size){
             int nextNodeId = chapters.get(index).getNextChapterId();
