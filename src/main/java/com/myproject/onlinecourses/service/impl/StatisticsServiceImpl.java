@@ -52,10 +52,12 @@ public class StatisticsServiceImpl implements StatisticsService {
         Map<String, Double> revenues = new HashMap<>();
 
         List<LocalDate> dates = firstOfMonth.datesUntil(firstOfFollowingMonth)
-                .sorted()
                 .collect(Collectors.toList());
 
-        dates.forEach(p -> revenues.put(p.toString(), 0.0));
+
+        for(LocalDate d : dates){
+            revenues.put(d.toString(), 0.0);
+        }
 
         List<IRevenuesInMonth> inMonth = repository.getRevenuesInMonth(year, month);
 
@@ -64,6 +66,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         });
 
         return new ResponseObject(revenues.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
                 .map(p -> new RevenuesInMonth(p.getKey(), p.getValue())));
     }
 
