@@ -22,7 +22,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Autowired
     StatisticsRepository repository;
-    private Class<?> mfogof;
+
 
     @Override
     public ResponseObject getRevenuesInYear(String year) {
@@ -77,8 +77,9 @@ public class StatisticsServiceImpl implements StatisticsService {
         int studentNums = repository.getTotalStudent();
         int teacherNums = repository.getTotalTeacher();
         int coursesNums = repository.getTotalCourses();
+        double totalRevenues = repository.getTotalRevenues();
 
-        OverallDashBoard res = new OverallDashBoard(studentNums, teacherNums, coursesNums, 0);
+        OverallDashBoard res = new OverallDashBoard(studentNums, teacherNums, coursesNums, 0, totalRevenues);
         return new ResponseObject(res);
     }
 

@@ -39,4 +39,9 @@ public interface StatisticsRepository extends JpaRepository<Order, String> {
             "from Course as c " +
             "where c.isActive = true")
     Integer getTotalCourses();
+
+    @Query("select sum(o.paymentPrice) " +
+            "from Order as o " +
+            "where o.isActive = true")
+    Double getTotalRevenues();
 }

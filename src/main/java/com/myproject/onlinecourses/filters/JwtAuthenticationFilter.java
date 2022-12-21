@@ -7,6 +7,7 @@ import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.repository.AccountRepository;
 import com.myproject.onlinecourses.security.CustomUserDetails;
 import com.myproject.onlinecourses.security.JwtProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,7 +27,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
 
-
+@Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
@@ -39,7 +40,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
         this.accountRepo = accountRepo;
-        setFilterProcessesUrl("/api/v1/login");
+        setFilterProcessesUrl("/api/v1/login/**");
+
     }
 
     @Override
@@ -49,6 +51,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             Optional<Account> found = accountRepo.findById(cred.getUsername());
             if(!found.isPresent())
                 throw new RuntimeException("Can not found username");
+
+            String pathInfo = request.getRequestURI();
+            log.info("PATH LOGIN: " + pathInfo);
+            if(pathInfo != null && pathInfo.equals("/api/v1/login/admin")){
+                if(!found.get().getRole().getName().equals("ADMIN") || found.get().getRole().getName().equals("TEACHER")){
+                    throw new RuntimeException("You do not have permission to access this page");
+                }
+            }
+
             return authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(
                             cred.getUsername(),

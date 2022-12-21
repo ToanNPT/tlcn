@@ -14,4 +14,5 @@ public class OverallDashBoard {
     private int teachersNum;
     private int coursesNum;
     private int requestToTeacher;
+    private double totalRevenues;
 }
