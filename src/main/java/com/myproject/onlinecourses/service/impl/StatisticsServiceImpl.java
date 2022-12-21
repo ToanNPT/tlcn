@@ -1,5 +1,6 @@
 package com.myproject.onlinecourses.service.impl;
 
+import com.myproject.onlinecourses.dto.OverallDashBoard;
 import com.myproject.onlinecourses.dto.ResponseObject;
 import com.myproject.onlinecourses.dto.RevenuesByMonth;
 import com.myproject.onlinecourses.dto.RevenuesInMonth;
@@ -21,6 +22,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Autowired
     StatisticsRepository repository;
+    private Class<?> mfogof;
 
     @Override
     public ResponseObject getRevenuesInYear(String year) {
@@ -68,6 +70,16 @@ public class StatisticsServiceImpl implements StatisticsService {
         return new ResponseObject(revenues.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .map(p -> new RevenuesInMonth(p.getKey(), p.getValue())));
+    }
+
+    @Override
+    public ResponseObject overviewDashBoard(){
+        int studentNums = repository.getTotalStudent();
+        int teacherNums = repository.getTotalTeacher();
+        int coursesNums = repository.getTotalCourses();
+
+        OverallDashBoard res = new OverallDashBoard(studentNums, teacherNums, coursesNums, 0);
+        return new ResponseObject(res);
     }
 
 }

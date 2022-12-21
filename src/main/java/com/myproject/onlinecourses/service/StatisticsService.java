@@ -6,4 +6,6 @@ public interface StatisticsService {
     ResponseObject getRevenuesInYear(String year);
 
     ResponseObject statisticRevenuesInMonth(Integer year, Integer month);
+
+    ResponseObject overviewDashBoard();
 }

@@ -22,4 +22,10 @@ public class AdminSatistics {
         return service.statisticRevenuesInMonth(year, month);
     }
 
+
+    @GetMapping("reports/overview")
+    public ResponseObject getOverviewDashBoard(){
+        return service.overviewDashBoard();
+    }
+
 }

@@ -24,4 +24,19 @@ public interface StatisticsRepository extends JpaRepository<Order, String> {
             "group by o.create_date " +
             "order by o.create_date asc", nativeQuery = true)
     List<IRevenuesInMonth> getRevenuesInMonth(Integer year, Integer month);
+
+    @Query("select count(a) " +
+            "from Account as a " +
+            "where a.role.id = 'TEACHER'")
+    Integer getTotalTeacher();
+
+    @Query("select count(s) " +
+            "from Account as s " +
+            "where s.role.id = 'USER'")
+    Integer getTotalStudent();
+
+    @Query("select count(c) " +
+            "from Course as c " +
+            "where c.isActive = true")
+    Integer getTotalCourses();
 }
