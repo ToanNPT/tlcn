@@ -13,7 +13,11 @@ public interface CourseVideoConverter {
     @Mappings({
             @Mapping(target = "courseId", source = "course.id"),
             @Mapping(target = "active", source = "active"),
-            @Mapping(target = "chapterId", source = "chapter.id")
+            @Mapping(target = "chapter.id", source = "chapter.id"),
+            @Mapping(target = "chapter.chapterName", source = "chapter.chapterName"),
+            @Mapping(target = "chapter.numVideos", source = "chapter.numVideos"),
+            @Mapping(target = "chapter.headChapter", source = "chapter.headChapter"),
+            @Mapping(target = "chapter.nextChapterId", source = "chapter.nextChapterId")
     })
     public CourseVideoDTO entityToDTO(CoursesVideo entity);
 
@@ -22,5 +26,7 @@ public interface CourseVideoConverter {
             @Mapping(target = "active", source = "active")
     })
     public CoursesVideo dtoToEntity(CourseVideoDTO dto);
+
+
 
 }

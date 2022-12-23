@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class CourseVideoDTO {
     private int id;
-    private int chapterId;
+    private ChapterInfo chapter;
     private String courseId;
     private String link;
     private String title;
