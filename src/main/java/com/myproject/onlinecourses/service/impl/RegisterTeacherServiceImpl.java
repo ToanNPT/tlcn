@@ -77,13 +77,11 @@ public class RegisterTeacherServiceImpl implements RegisterTeacherService {
 
     @Override
     public ResponseObject acceptRequest(String username, Integer requestId){
-        Optional<Account> account = accountRepository.findById(username);
-        Mail mail = mailService.createMailInfo(account.get(),
-                "YÊU CẦU TRỞ THÀNH GIẢNG VIÊN TẠI ONLINE-COURSES THÀNH CÔNG");
         Optional<RegisterTeacherForm> existedRequest = repository.findById(requestId);
         if(!existedRequest.isPresent())
             throw new NotFoundException("Can not found submitted form");
 
+        Optional<Account> account = accountRepository.findById(existedRequest.get().getAccount().getUsername());
         Optional<Role> role = roleRepository.findById(Roles.TEACHER.value);
         account.get().setRole(role.get());
         accountRepository.save(account.get());
@@ -91,6 +89,8 @@ public class RegisterTeacherServiceImpl implements RegisterTeacherService {
         existedRequest.get().setStatus(Status.ACCEPT.value);
         RegisterTeacherForm updatedRequest = repository.save(existedRequest.get());
 
+        Mail mail = mailService.createMailInfo(account.get(),
+                "YÊU CẦU TRỞ THÀNH GIẢNG VIÊN TẠI ONLINE-COURSES THÀNH CÔNG");
         mailService.sendMail(mail, "accept-to-a-teacher");
         return new ResponseObject(updatedRequest);
     }
