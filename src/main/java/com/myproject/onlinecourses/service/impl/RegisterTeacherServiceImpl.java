@@ -105,6 +105,7 @@ public class RegisterTeacherServiceImpl implements RegisterTeacherService {
             throw new NotFoundException("Can not found submitted form");
 
         existedRequest.get().setStatus(Status.REJECT.value);
+        repository.save(existedRequest.get());
         mailService.sendMail(mail, "reject-request-teacher");
 
         return new ResponseObject(existedRequest);
