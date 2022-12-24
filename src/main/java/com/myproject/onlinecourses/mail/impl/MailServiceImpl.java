@@ -40,13 +40,29 @@ public class MailServiceImpl implements MailService {
 
         Map<String, Object> model = new HashMap<>();
         model.put("username", account.getUsername());
-        model.put("signature", "From FPT_TRAINING_HCMUTE");
-        model.put("WEBSITE_NAME", "DEMO_TGDD");
+        model.put("signature", "From OnlineCourses");
+        model.put("WEBSITE_NAME", "Online-Courses");
         String url = "http://localhost:8080/api/v1/reset-password/" + token;
         model.put("resetUrl", url );
         mail.setModel(model);
         return mail;
     }
+
+    @Override
+    public Mail createMailInfo(Account account, String subject){
+        Mail mail = new Mail();
+        mail.setFrom(serverMail);
+        mail.setTo(account.getUserDetail().getEmail());
+        mail.setSubject(subject);
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("username", account.getUsername());
+        model.put("signature", "From OnlineCourses");
+        model.put("WEBSITE_NAME", "Online-Courses");
+        mail.setModel(model);
+        return mail;
+    }
+
 
     @Override
     public Mail createConfirmOrderMail(Order order, Account account, String subject){
@@ -57,7 +73,7 @@ public class MailServiceImpl implements MailService {
 
         Map<String, Object> model = new HashMap<>();
         model.put("username", order.getAccount().getUserDetail().getFullname());
-        model.put("signature", "From FPT_TRAINING_HCMUTE");
+        model.put("signature", "From OnlineCourses");
         model.put("WEBSITE_NAME", "OnlineCourses");
         model.put("total", order.getTotalPrice());
         System.out.println(order.getTotalPrice() - order.getPaymentPrice());
