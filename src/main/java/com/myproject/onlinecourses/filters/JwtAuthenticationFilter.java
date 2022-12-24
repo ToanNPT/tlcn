@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             String pathInfo = request.getRequestURI();
             log.info("PATH LOGIN: " + pathInfo);
             if(pathInfo != null && pathInfo.equals("/api/v1/login/admin")){
-                if(!found.get().getRole().getName().equals("ADMIN") || found.get().getRole().getName().equals("TEACHER")){
+                if(!found.get().getRole().getName().equals("ADMIN") || !found.get().getRole().getName().equals("TEACHER")){
                     throw new RuntimeException("You do not have permission to access this page");
                 }
             }
