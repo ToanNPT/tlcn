@@ -8,6 +8,7 @@ import com.myproject.onlinecourses.interfaceMapping.IRevenuesByInYear;
 import com.myproject.onlinecourses.interfaceMapping.IRevenuesInMonth;
 import com.myproject.onlinecourses.repository.StatisticsRepository;
 import com.myproject.onlinecourses.service.StatisticsService;
+import com.myproject.onlinecourses.utils.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,8 +79,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         int teacherNums = repository.getTotalTeacher();
         int coursesNums = repository.getTotalCourses();
         double totalRevenues = repository.getTotalRevenues();
-
-        OverallDashBoard res = new OverallDashBoard(studentNums, teacherNums, coursesNums, 0, totalRevenues);
+        int requestToTeacher = repository.countRequestByStatus(Status.OPEN.value);
+        OverallDashBoard res = new OverallDashBoard(studentNums, teacherNums, coursesNums, requestToTeacher, totalRevenues);
         return new ResponseObject(res);
     }
 

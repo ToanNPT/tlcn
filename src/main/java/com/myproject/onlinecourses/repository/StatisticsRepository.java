@@ -44,4 +44,9 @@ public interface StatisticsRepository extends JpaRepository<Order, String> {
             "from Order as o " +
             "where o.isActive = true")
     Double getTotalRevenues();
+
+    @Query("select count(form) " +
+            "from RegisterTeacherForm as form " +
+            "where form.status = :status")
+    Integer countRequestByStatus(String status);
 }
