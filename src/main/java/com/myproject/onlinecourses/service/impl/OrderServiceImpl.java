@@ -1,9 +1,8 @@
 package com.myproject.onlinecourses.service.impl;
 
+import com.myproject.onlinecourses.converter.CourseConverter;
 import com.myproject.onlinecourses.converter.OrderConverter;
-import com.myproject.onlinecourses.dto.OrderDTO;
-import com.myproject.onlinecourses.dto.OrderDetailDTO;
-import com.myproject.onlinecourses.dto.RequestOrder;
+import com.myproject.onlinecourses.dto.*;
 import com.myproject.onlinecourses.entity.*;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.*;
@@ -11,12 +10,16 @@ import com.myproject.onlinecourses.service.CartService;
 import com.myproject.onlinecourses.service.CouponService;
 import com.myproject.onlinecourses.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.myproject.onlinecourses.entity.Coupon_.code;
@@ -53,6 +56,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     CartService cartService;
+
+    @Autowired
+    CourseConverter courseConverter;
 
     @Override
     public OrderDTO addOrder(RequestOrder dto){
@@ -261,4 +267,36 @@ public class OrderServiceImpl implements OrderService {
 
         orderRepo.save(order.get());
     }
+
+    @Override
+    public ResponseObject getAllActiveOrder(Optional<Integer> page, Optional<Integer> limit){
+        Pageable pageable = PageRequest.of(page.orElse(0), limit.orElse(10));
+        Page<Order> orders = orderRepo.findActiveOrders(pageable);
+        Page<OrderDTO> dtos = orders.map(new Function<Order, OrderDTO>() {
+            @Override
+            public OrderDTO apply(Order order) {
+                return converter.orderToOrderDTO(order);
+            }
+        });
+        return new ResponseObject(dtos);
+    }
+
+    @Override
+    public ResponseObject getDetailOrderById(String orderId){
+        Optional<Order> order = orderRepo.findById(orderId);
+        if(!order.isPresent())
+            throw new NotFoundException("Can not found order id "+ orderId);
+
+        DetailOrder dto = converter.orderToDetailOrder(order.get());
+        List<CourseDTO> coursesPaids = new ArrayList<>();
+        for(OrderDetail item : order.get().getOrderDetailList()){
+            CourseDTO courseDTO = courseConverter.entityToCourseDTO(item.getCourse());
+            courseDTO.setPrice(item.getPrice());
+            coursesPaids.add(courseDTO);
+        }
+        dto.setOrderDetailList(coursesPaids);
+        return new ResponseObject(dto);
+    }
+
+
 }
