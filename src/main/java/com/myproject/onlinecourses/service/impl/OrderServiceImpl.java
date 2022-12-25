@@ -272,12 +272,21 @@ public class OrderServiceImpl implements OrderService {
     public ResponseObject getAllActiveOrder(Optional<Integer> page, Optional<Integer> limit){
         Pageable pageable = PageRequest.of(page.orElse(0), limit.orElse(10));
         Page<Order> orders = orderRepo.findActiveOrders(pageable);
-        Page<OrderDTO> dtos = orders.map(new Function<Order, OrderDTO>() {
+        Page<DetailOrder> dtos = orders.map(new Function<Order, DetailOrder>() {
             @Override
-            public OrderDTO apply(Order order) {
-                return converter.orderToOrderDTO(order);
+            public DetailOrder apply(Order order) {
+                List<CourseDTO> courseDTOS = new ArrayList<>();
+                for(OrderDetail item : order.getOrderDetailList()){
+                    CourseDTO courseDTO = courseConverter.entityToCourseDTO(item.getCourse());
+                    courseDTO.setPrice(item.getPrice());
+                    courseDTOS.add(courseDTO);
+                }
+                DetailOrder detail = converter.orderToDetailOrder(order);
+                detail.setOrderDetailList(courseDTOS);
+                return detail;
             }
         });
+
         return new ResponseObject(dtos);
     }
 
