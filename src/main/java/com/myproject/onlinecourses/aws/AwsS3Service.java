@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -53,17 +54,21 @@ public class AwsS3Service {
         String accessKey = environment.getProperty("amazonProperties.videoBucket.accessKey");
         String secretKey = environment.getProperty("amazonProperties.videoBucket.secretKey");
 
-            AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-            AmazonS3 s3client = new AmazonS3Client(credentials);
-            if(bucketname.equals(bucketVideo))
-                s3client.setRegion(Region.getRegion(Regions.US_EAST_1));
-            else if(bucketname.equals(buckeAvaterCourse) || bucketname.equals(bucketResource))
-                s3client.setRegion(Region.getRegion(Regions.US_WEST_2));
-            PutObjectRequest request = new PutObjectRequest(bucketname, fileName, file);
-            request.withCannedAcl(CannedAccessControlList.PublicRead);
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AmazonS3 s3client = new AmazonS3Client(credentials);
+        if (bucketname.equals(bucketVideo))
+            s3client.setRegion(Region.getRegion(Regions.US_EAST_1));
+        else if (bucketname.equals(buckeAvaterCourse) || bucketname.equals(bucketResource))
+            s3client.setRegion(Region.getRegion(Regions.US_WEST_2));
 
-            s3client.putObject(request);
-            return s3client.getUrl(bucketname, fileName).toString();
+//        ObjectMetadata metadata = new ObjectMetadata();
+//        metadata.setContentType("video/mp4");
+        PutObjectRequest request = new PutObjectRequest(bucketname, fileName, file);
+        request.withCannedAcl(CannedAccessControlList.PublicRead);
+//        request.withMetadata(metadata);
+
+        s3client.putObject(request);
+        return s3client.getUrl(bucketname, fileName).toString();
     }
 
 
