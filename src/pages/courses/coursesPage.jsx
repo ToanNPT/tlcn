@@ -215,7 +215,7 @@ export default function CoursesPage() {
                 step={100000}
                 size="small"
                 min={0}
-                max={100000000}
+                max={10000000}
               />
               <p className="value__filter">
                 {priceRange[0].toLocaleString("vi", {

@@ -71,3 +71,10 @@ export const formatDateDisplay = (date, separator = " / ") => {
     ? moment(date).format("DD" + separator + "MM" + separator + "YYYY")
     : "";
 };
+
+// convert seconds to hh:mm:ss
+export const formatTime = (seconds) => {
+  const date = new Date(null);
+  date.setSeconds(seconds);
+  return date.toISOString().substr(11, 8);
+};

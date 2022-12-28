@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { formatDateDisplay } from "../../utils/MyUtils";
 
 export default function SuccessPage(props) {
@@ -15,18 +16,11 @@ export default function SuccessPage(props) {
   const paymentType = query.get("paymentType");
   const orderInfo = query.get("orderInfo");
 
-  console.log("orderId", orderId);
-  console.log("totalPrice", totalPrice);
-  console.log("paymentPrice", paymentPrice);
-  console.log("discountPrice", discountPrice);
-  console.log("orderDate", orderDate);
-  console.log("paymentType", paymentType);
-  console.log("orderInfo", orderInfo.split(","));
-
   const { currentUser } = useSelector((state) => state.user);
   const temp = JSON.parse(orderInfo);
   console.log("current user:", temp);
 
+  const nav = useNavigate();
   return (
     <div className="container successpage d-flex justify-content-center align-items-center ">
       <div className="row">
@@ -48,17 +42,26 @@ export default function SuccessPage(props) {
         <div className="col-12 col-md-6">
           <div className="success__content d-flex flex-column justify-content-center align-items-center h-100 text-center">
             <h1>Mua khóa học thành công</h1>
-            <h3>Tên khóa học: {temp?.name}</h3>
+
+            <h3>
+              <ul>
+                Tên khóa học:{" "}
+                {temp.map((item, index) => {
+                  return <li key={index}>{index + 1 + " - " + item.name}</li>;
+                })}
+              </ul>
+            </h3>
             <span>Mã đơn hàng: {orderId}</span>
 
             <span>Ngày mua: {formatDateDisplay(orderDate)}</span>
             <span>
-              Giá:{" "}
-              {Number(paymentPrice).toLocaleString("vi", {
+              Tổng tiền:{" "}
+              {Number(totalPrice).toLocaleString("vi", {
                 currency: "VND",
               })}{" "}
               VNĐ
             </span>
+
             <span>
               Giảm giá:{" "}
               {Number(discountPrice).toLocaleString("vi", {
@@ -66,10 +69,24 @@ export default function SuccessPage(props) {
               })}{" "}
               VNĐ
             </span>
+            <span>
+              Tổng số tiền thanh toán:{" "}
+              {Number(paymentPrice).toLocaleString("vi", {
+                currency: "VND",
+              })}{" "}
+              VNĐ
+            </span>
             <h4>Học viên: {currentUser?.fullname}</h4>
             <div className=" d-flex gap-3">
-              <button className="success__btn">Về trang chủ</button>
-              <button className="success__btn">Đến khóa học</button>
+              <button className="success__btn" onClick={() => nav("/")}>
+                Về trang chủ
+              </button>
+              <button
+                className="success__btn"
+                onClick={() => nav(`/course/${temp[0]?.courseId}`)}
+              >
+                Đến khóa học
+              </button>
             </div>
           </div>
         </div>

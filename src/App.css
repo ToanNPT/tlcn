@@ -642,9 +642,9 @@ a {
 }
 
 .successpage {
-  height: 100vh;
   background: #fff;
   color: #212121;
+  margin: 20px 0;
 }
 
 .success__content h1 {
@@ -1039,6 +1039,40 @@ a {
   color: #00693e !important;
 }
 .learn__video {
-  height: 530px;
+  background: #000;
+}
+.learn__viewer {
   width: 100%;
+}
+.learn__viewer video {
+  width: inherit;
+}
+.learn .nav-tabs .nav-link.active {
+  border: none;
+}
+.learn .nav-link {
+  color: #000;
+  transition: none;
+  margin-bottom: 0;
+  border: none;
+}
+.learn .nav-link:hover {
+  border: none;
+  transition: none;
+}
+.time__video {
+  background: #000;
+  color: #fff;
+  padding: 5px;
+  border-radius: 6px;
+  max-width: min-content;
+  font-size: 12px;
+}
+.note__item-time {
+  background: #000;
+  color: #fff;
+  padding: 5px;
+  border-radius: 6px;
+  max-width: min-content;
+  font-size: 11px;
 }

@@ -199,15 +199,26 @@ const CoursePage = (props) => {
             </div>
             <img
               className="img-fluid course__img"
-              src={
-                course?.avatar
-                  ? course?.avatar
-                  : require("../../assets/img/course.webp")
-              }
+              src={course?.avatar ? course?.avatar : ""}
               alt="avatarcourse"
             />
 
-            <p className="text-center mt-3 course__price">
+            {course?.price !== 0 ? (
+              <p className="text-center mt-3 course__price">
+                <span> Chỉ</span>{" "}
+                {course
+                  ? course.price.toLocaleString("vi", {
+                      currency: "VND",
+                    })
+                  : ""}{" "}
+                <span>VNĐ</span>{" "}
+              </p>
+            ) : (
+              <p className="text-center mt-3 course__price">
+                <span> Miễn phí</span>{" "}
+              </p>
+            )}
+            {/* <p className="text-center mt-3 course__price">
               <span> Chỉ</span>{" "}
               {course
                 ? course.price.toLocaleString("vi", {
@@ -215,7 +226,7 @@ const CoursePage = (props) => {
                   })
                 : ""}{" "}
               <span>VNĐ</span>{" "}
-            </p>
+            </p> */}
 
             {wasBought ? (
               <div className="d-flex justify-content-center mt-3 gap-2">

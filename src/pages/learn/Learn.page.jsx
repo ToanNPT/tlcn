@@ -14,8 +14,18 @@ import coursesApi from "../../api/coursesApi";
 import coursesVideoApi from "../../api/coursesVideoApi";
 import Accordion from "react-bootstrap/Accordion";
 import BackToTop from "../../components/BackToTop/BackToTop";
-
+import FileViewer from "react-file-viewer";
+import { BiNotepad } from "react-icons/bi";
+import { Col, Form, Row, Tab, Tabs } from "react-bootstrap";
+import { Button } from "react-bootstrap";
+import noteApi from "../../api/noteApi";
+import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
+import { AiOutlineDelete } from "react-icons/ai";
+import { useRef } from "react";
+import { formatTime } from "../../utils/MyUtils";
 const LearnPage = () => {
+  const { currentUser } = useSelector((state) => state.user);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const courseId = location.pathname.split("/")[2];
@@ -23,7 +33,7 @@ const LearnPage = () => {
   const [listVideo, setListVideo] = useState([]);
   const [listChapters, setListChapters] = useState([]);
   const nav = useNavigate();
-  const currentVideoId = listVideo[2]?.id;
+
   //Get video course by courseId
   useEffect(() => {
     const getData = async () => {
@@ -40,15 +50,6 @@ const LearnPage = () => {
     };
     getData();
   }, [courseId]);
-  // useEffect(() => {
-  //   if (!searchParams.get("id")) {
-  //     setSearchParams(
-  //       { id: currentVideoId ? currentVideoId : 1 },
-  //       { replace: true }
-  //     );
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
 
   // Bài học hiện tại
   const [currentPicker, setCurrenPicker] = useState({
@@ -58,7 +59,6 @@ const LearnPage = () => {
     currentChapter: null,
     currentVideoOfChapter: null,
   });
-  console.log("currentPicker", currentPicker);
   // Kiểm tra khóa học đã được đăng ký hay chưa
   const user = useSelector((state) => state.user.currentUser);
 
@@ -81,11 +81,60 @@ const LearnPage = () => {
     checkRegistered();
   }, [courseId, user?.username]);
 
-  //Get video by videoId
+  //Get video by videoId và get listnote of video
+  const [listNote, setListNote] = useState([]);
+  //react hook form
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+  const fetchDataNote = async () => {
+    try {
+      const res = await noteApi.getnotebyvideoid(
+        currentUser?.username,
+        searchParams.get("id")
+      );
+      console.log("resNote", res.data);
+      setListNote(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const onSubmit = async (data) => {
+    data.username = currentUser?.username;
+    data.videoId = searchParams.get("id");
+    data.atTime = formatTime(videoRef.current.currentTime);
+    try {
+      const res = await noteApi.addnote(data);
+      if (res.errorCode === "") {
+        Swal.fire({
+          icon: "success",
+          title: "Thêm ghi chú thành công",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        await fetchDataNote();
+        setValue("content", "");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Thêm ghi chú thất bại",
+          text: res.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    } catch (error) {}
+  };
+
   useEffect(() => {
     const getVideo = async () => {
       try {
         const res = await coursesVideoApi.getbyId(searchParams.get("id"));
+        await fetchDataNote();
+
         setCurrenPicker({
           ...currentPicker,
           srcVideo: res.data?.link,
@@ -100,12 +149,13 @@ const LearnPage = () => {
     };
     getVideo();
   }, [searchParams.get("id")]);
+
+  //
   //Handle next video không sử dụng thứ tự của videoID
   const handleNextVideo = () => {
     const currIndex = listVideo.findIndex(
       (item) => item.id == searchParams.get("id")
     );
-    console.log(currIndex, searchParams.get("id"));
     const nextVideo = listVideo[currIndex + 1];
     console.log(nextVideo);
     if (nextVideo) {
@@ -122,11 +172,40 @@ const LearnPage = () => {
       setSearchParams({ id: prevVideo.id });
     }
   };
-  const duration = document.getElementById("item-videoCourse")?.duration;
-  return wasBought || isPublicCourse ? (
-    <div>
-      <BackToTop />
 
+  //Get current time of video
+  const videoRef = useRef(null);
+
+  const [currentTime, setCurrentTime] = useState(0);
+  const handleChangeTime = (e) => {
+    setCurrentTime(Math.floor(e.target.currentTime));
+  };
+
+  const handleDeleteNote = async (id) => {
+    try {
+      const res = await noteApi.deletenotebyid(id);
+      if (res.errorCode === "") {
+        Swal.fire({
+          icon: "success",
+          title: "Xóa ghi chú thành công",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        await fetchDataNote();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Xóa ghi chú thất bại",
+          text: res.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    } catch (error) {}
+  };
+
+  return wasBought || isPublicCourse ? (
+    <div className="learn">
       <div className="row header__tool d-flex flex-row justify-content-center align-items-center position-sticky">
         <div className="tool__container d-flex flex-row justify-content-between align-items-center gap-4 my-2">
           <span className="d-flex justify-content-between align-items-center">
@@ -153,7 +232,14 @@ const LearnPage = () => {
               gacy
             </Link>
           </span>
-
+          <div
+            className="d-flex flex-row justify-content-center align-items-center gap-1"
+            style={{
+              color: "#fff",
+            }}
+          >
+            <BiNotepad /> {course?.name}
+          </div>
           <span className="d-flex flex-row justify-content-center align-items-center gap-3">
             <Box sx={{ position: "relative", display: "inline-flex" }}>
               <CircularProgress variant="determinate" value={20} />
@@ -178,7 +264,7 @@ const LearnPage = () => {
           </span>
         </div>
       </div>
-      <div className="row my-3 ">
+      <div className="row my-3 mb-5">
         <div className="col-12 col-lg-9">
           <div className="">
             {!currentPicker.srcVideo ? (
@@ -190,22 +276,107 @@ const LearnPage = () => {
                 />
               </div>
             ) : (
-              <iframe
+              // <iframe
+              //   width="100%"
+              //   height="500"
+              //   src={currentPicker.srcVideo}
+              //   title={currentPicker.title}
+              //   frameBorder="0"
+              //   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              //   allowFullScreen
+              //   className="learn-iframe"
+              // ></iframe>
+              <video
+                id="myVideo"
+                className="learn__video"
                 width="100%"
-                height="530"
+                height="500px"
                 src={currentPicker.srcVideo}
-                title={currentPicker.title}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="learn-iframe"
-              ></iframe>
+                controls
+                autoPlay
+                onTimeUpdate={handleChangeTime}
+                ref={videoRef}
+              ></video>
+              //React file viewer
+              // <FileViewer
+              //   className="learn__viewer"
+              //   fileType={"mp4"}
+              //   filePath={currentPicker?.srcVideo}
+              //   onError={(e) => console.log(e)}
+              // />
             )}
 
-            <h4 className="video__title mt-3 text-left">
-              {currentPicker?.title}
-            </h4>
-            <p>{currentPicker?.des}</p>
+            <Tabs
+              defaultActiveKey="overview"
+              id="uncontrolled-tab-example"
+              className="mb-3"
+            >
+              <Tab eventKey="overview" title="Tổng quan">
+                <h4 className="video__title mt-3 text-left">
+                  {currentPicker?.title}
+                </h4>
+                <p>{currentPicker?.des}</p>
+              </Tab>
+              <Tab eventKey="note" title="Note">
+                {/* Form add note */}
+                <div className="note__container">
+                  <div className="note__form mb-4">
+                    <Form onSubmit={handleSubmit(onSubmit)}>
+                      <Row>
+                        <Col md={6} xs={12}>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Thêm ghi chú</Form.Label>
+
+                            <div className="time__video mb-1">
+                              {formatTime(currentTime)}
+                            </div>
+                            <Form.Control
+                              as="textarea"
+                              rows={3}
+                              placeholder="Nhập ghi chú"
+                              {...register("content", { required: true })}
+                            />
+                          </Form.Group>
+                          <Button
+                            className="main__btn"
+                            onClick={handleSubmit(onSubmit)}
+                          >
+                            Thêm ghi chú
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Form>
+                  </div>
+                  <div className=" row note__list">
+                    <Form.Label>Danh sách note</Form.Label>
+                    {listNote?.map((item, index) => {
+                      return (
+                        <div className=" note__item mb-2" key={index}>
+                          <div className="note__item-header">
+                            <span className="note__item-time me-3">
+                              {item.atTime}
+                            </span>
+                            <span className="note__item-delete">
+                              <AiOutlineDelete
+                                size={20}
+                                cursor="pointer"
+                                onClick={() => handleDeleteNote(item.id)}
+                              />
+                            </span>
+                          </div>
+                          <div className="note__item-content">
+                            {item.content}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </Tab>
+              <Tab eventKey="Q&A" title="Hỏi đáp">
+                Chức năng chưa hoàn thiện
+              </Tab>
+            </Tabs>
           </div>
         </div>
         <div className="col-12 col-lg-3 ">

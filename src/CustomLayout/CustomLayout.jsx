@@ -9,7 +9,6 @@ import MainRoute from "../MainRoute/MainRoute";
 export default function CustomLayout() {
   return (
     <>
-      <BackToTop />
       <Header />
       <MainRoute />
       <Footer />

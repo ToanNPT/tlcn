@@ -217,7 +217,7 @@ function Header() {
           className="collapse navbar-collapse grow"
           id="navbarSupportedContent"
         >
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
+          <ul className="nav__ne navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
             <li className="nav-item ">
               <Link
                 className={

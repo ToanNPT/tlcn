@@ -5,7 +5,7 @@ import { BsArrowLeftShort } from "react-icons/bs";
 
 import { MdDownload } from "react-icons/md";
 import { RiSave3Fill } from "react-icons/ri";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import userApi from "../../api/userApi";
@@ -16,6 +16,8 @@ import AccountInfo from "./components/AccountInfo";
 import ModalRequestBecomeTeacher from "./components/ModalRequestBecomeTeacher";
 import ModalUpdateAvatar from "./components/ModalUpdateAvatar";
 const Account = () => {
+  const { currentUser } = useSelector((state) => state.user);
+
   const username = useLocation().pathname.split("/")[2];
   const [userDetail, setUserDetail] = useState();
   //get detail user
@@ -107,7 +109,12 @@ const Account = () => {
               </button>
               <div className="account__left__name">
                 <h3>
-                  Student <br /> <span>{userDetail?.fullname}</span>
+                  {currentUser.role === "TEACHER"
+                    ? "Teacher"
+                    : currentUser.role === "ROLE_01"
+                    ? "Admin"
+                    : "Student"}
+                  <br /> <span>{userDetail?.fullname}</span>
                 </h3>
               </div>
               <div className="account__left__info">
@@ -121,14 +128,18 @@ const Account = () => {
                 <button className="" onClick={handleLogout}>
                   <BiLogOut className="me-2" /> Đăng xuất
                 </button>
-                <button
-                  className=""
-                  onClick={() => {
-                    setShowModalRequestBecomeTeacher(true);
-                  }}
-                >
-                  <MdDownload className="me-2" /> Yêu cầu trở thành giảng viên
-                </button>
+                {currentUser?.role !== "TEACHER" &&
+                  currentUser?.role !== "ROLE_01" && (
+                    <button
+                      className=""
+                      onClick={() => {
+                        setShowModalRequestBecomeTeacher(true);
+                      }}
+                    >
+                      <MdDownload className="me-2" /> Yêu cầu trở thành giảng
+                      viên
+                    </button>
+                  )}
               </div>
             </div>
           </div>

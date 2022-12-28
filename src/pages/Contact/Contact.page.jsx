@@ -9,9 +9,9 @@ export default function ContactPage() {
           <div className="col-12 col-md-6">
             <div className="contact__left">
               <lottie-player
-                src="https://assets1.lottiefiles.com/packages/lf20_u25cckyh.json"
+                src="https://assets4.lottiefiles.com/packages/lf20_ksklhijl.json"
                 background="transparent"
-                speed="1"
+                speed="1.5"
                 loop
                 autoplay
               ></lottie-player>

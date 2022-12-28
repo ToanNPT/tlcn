@@ -21,6 +21,8 @@ export default function SignUp() {
   });
   const nav = useNavigate();
   const onSubmit = async (data) => {
+    //config birthdate
+    data.birthdate = new Date(data.birthdate).toISOString().slice(0, 10);
     const formData = new FormData();
     Object.keys(data).forEach((key) => {
       if (data[key] !== undefined && data[key] !== null) {
