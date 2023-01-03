@@ -87,8 +87,9 @@ public class NoteServiceImpl implements NoteService {
         if(!account.isPresent() || !video.isPresent())
             throw new NotFoundException("Something is wrong when try adding");
 
-        String check = coursesRepo.checkPurchaseCourse(dto.getUsername(), video.get().getCourse().getId());
-        if(check == null)
+        //String check = coursesRepo.checkPurchaseCourse(dto.getUsername(), video.get().getCourse().getId());
+        Optional<CoursePaid> paid = coursePaidRepository.isPaid(video.get().getCourse().getId(), dto.getUsername());
+        if(!paid.isPresent())
             throw new NotFoundException("You did not buy this course");
 
         note.get().setAtTime(dto.getAtTime());
