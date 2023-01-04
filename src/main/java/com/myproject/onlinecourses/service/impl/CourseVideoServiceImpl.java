@@ -122,6 +122,9 @@ public class CourseVideoServiceImpl implements CourseVideoService {
 
         CoursesVideo inserted = setPositionVideo(coursesVideo);
 
+        int currentNumVideos = chapter.get().getNumVideos();
+        chapter.get().setNumVideos(currentNumVideos +1);
+        chapterRepo.save(chapter.get());
         return new ResponseObject(converter.entityToDTO(inserted));
     }
 
