@@ -65,7 +65,13 @@ const MyLearning = () => {
       <div className="container-fluid">
         <div className="row m-0 p-0">
           <Tabs defaultActiveKey="coursebought" className="mb-3 ">
-            <Tab eventKey="coursebought" title="Khóa học đã mua">
+            <Tab
+              style={{
+                overflow: "auto",
+              }}
+              eventKey="coursebought"
+              title="Khóa học đã mua"
+            >
               <div className="row m-0 p-0 justify-content-evenly  align-items-center gap-1">
                 {listCourseBought.map((item, index) => {
                   return (

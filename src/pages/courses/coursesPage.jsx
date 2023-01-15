@@ -230,7 +230,15 @@ export default function CoursesPage() {
 
             <Box sx={{ width: "90%", marginBottom: "20px" }}>
               <p className="filter__type ">Lọc theo loại khóa học</p>
-              <FormGroup sx={{ fontFamily: "inherit", fontSize: "11px" }}>
+              <FormGroup
+                sx={{
+                  fontFamily: "inherit",
+                  fontSize: "11px",
+                  maxHeight: "170px",
+                  maxWidth: "100%",
+                  overflow: "auto",
+                }}
+              >
                 {listCategories.map((item, index) => {
                   return (
                     <FormControlLabel

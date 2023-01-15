@@ -8,6 +8,7 @@ import CoursePage from "../pages/course/course.page";
 import CoursesPage from "../pages/courses/coursesPage";
 import HomePage from "../pages/home/homePage";
 import LearnPage from "../pages/learn/Learn.page";
+import NotFound from "../pages/NotFound/NotFound";
 import FailPage from "../pages/ResultPurchar/Fail.page";
 import SuccessPage from "../pages/ResultPurchar/Success.page";
 
@@ -25,7 +26,7 @@ const MainRoute = () => {
         <Route path="/contact" element={<ContactPage />} />
 
         {/* <Route path="/*" element={<BlogPage />} /> */}
-        <Route path="*" element={<>Not Found</>} />
+        <Route path="*" element={<NotFound />} />
         <Route path="/purcharse/success" element={<SuccessPage />} />
         <Route path="/purcharse/fail" element={<FailPage />} />
       </Routes>

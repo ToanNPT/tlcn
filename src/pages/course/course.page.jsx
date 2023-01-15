@@ -4,7 +4,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { Tabs } from "react-bootstrap";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import coursesApi from "../../api/coursesApi";
 import reviewApi from "../../api/reviewApi";
 import ReviewForm from "./reviewForm/reviewForm";
@@ -14,6 +14,7 @@ import { handleAddtoCart } from "../../redux/cartRedux";
 import Swal from "sweetalert2";
 const CoursePage = (props) => {
   const user = useSelector((state) => state.user.currentUser);
+  const nav = useNavigate();
   const { listCart } = useSelector((state) => state.cart);
   const courseId = useLocation().pathname.split("/")[2];
   const [course, setCourse] = useState();
@@ -26,7 +27,7 @@ const CoursePage = (props) => {
         const resReview = await reviewApi.getReviewByCourseId(courseId);
         setListReviews(resReview.data.content);
       } catch (error) {
-        console.log(error);
+        nav("/404");
       }
     };
     getCourse();

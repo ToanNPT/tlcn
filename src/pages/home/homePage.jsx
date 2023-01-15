@@ -18,7 +18,7 @@ export default function HomePage() {
               <h2>Người tạo website</h2>
             </div>
             <div className="row">
-              <div className="col-12 col-md-6">
+              <div className="col-12 col-md-6" data-aos="flip-left">
                 <div className="user__created__box p-5">
                   <img
                     src={require("../../assets/img/trung.jpg")}
@@ -32,7 +32,7 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              <div className="col-12 col-md-6">
+              <div className="col-12 col-md-6 " data-aos="flip-right">
                 <div className="user__created__box p-5">
                   <img
                     src={require("../../assets/img/toan.jpg")}
