@@ -22,4 +22,18 @@ public class TaskPoolConfig {
         executor.setAwaitTerminationSeconds(600);
         return executor;
     }
+
+    @Bean("webflux")
+    public Executor webfluxTaskExecutor(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(15);
+        executor.setQueueCapacity(200);
+        executor.setKeepAliveSeconds(60);
+        executor.setThreadNamePrefix("taskExecutor-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(600);
+        return executor;
+    }
 }

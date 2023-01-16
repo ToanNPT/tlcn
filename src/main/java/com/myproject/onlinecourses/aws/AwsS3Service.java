@@ -5,19 +5,21 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 @Service
@@ -42,6 +44,8 @@ public class AwsS3Service {
     @Value("${amazonProperties.resource.bucketName}")
     private String bucketResource;
 
+    @Autowired
+    ResourceLoader loader;
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
         File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
         FileOutputStream fos = new FileOutputStream(convFile);

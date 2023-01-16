@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  mysqldb:
+    image: mysql:latest
+    env_file:
+      - ./src/main/resources/env_file/docker.env
+    environment:
+      - MYSQL_ROOT_PASSWORD = ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./src/main/resources/sql_script:/docker-entrypoint-initdb.d
+    ports:
+      - 8088:3306
+    networks:
+      - server-network
+  backend:
+    depends_on:
+      - mysqldb
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      - server-network
+  client:
+    container_name: client_app
+    image: client:1.0
+    ports:
+      - 3000:3000
+    networks:
+      - server-network
+
+
+networks:
+  server-network:
+
+
+
+
+
+
+
+
