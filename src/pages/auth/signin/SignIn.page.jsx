@@ -20,6 +20,7 @@ export default function SignIn() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const onSubmit = async (data) => {
+    console.log(process.env.REACT_APP_SERVER_ENDPOINT)
     try {
       const res = await userApi.login(data);
       if (!res.errorCode) {

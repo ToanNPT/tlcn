@@ -17,6 +17,7 @@
     "axios": "^0.27.2",
     "bootstrap": "^5.2.0",
     "date-fns": "^2.29.3",
+    "env-cmd": "^10.1.0",
     "js-cookie": "^3.0.1",
     "moment": "^2.29.4",
     "query-string": "^7.1.1",
@@ -36,9 +37,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "env-cmd -f .env.local react-scripts start",
+    "start:docker": "env-cmd -f .env.docker react-scripts start",
+    "build": "env-cmd -f .env.local react-scripts build",
+    "test": "env-cmd -f .env.local react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
