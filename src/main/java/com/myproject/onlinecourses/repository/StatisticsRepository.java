@@ -6,6 +6,7 @@ import com.myproject.onlinecourses.interfaceMapping.IRevenuesByInYear;
 import com.myproject.onlinecourses.interfaceMapping.IRevenuesInMonth;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -16,14 +17,15 @@ public interface StatisticsRepository extends JpaRepository<Order, String> {
             "where o.is_active = true and year(o.create_date) = ? " +
             "group by month(o.create_date) " +
             "order by month(o.create_date) asc", nativeQuery = true)
-    List<IRevenuesByInYear> getRevenuesByMonths(String year);
+    List<IRevenuesByInYear> getRevenuesByMonths(@Param("year") String year);
 
     @Query(value = "select o.create_date as day, sum(o.payment_price) as value " +
             "from orders as o " +
             "where o.is_active = true and year(o.create_date) = :year and month(o.create_date) = :month " +
             "group by o.create_date " +
             "order by o.create_date asc", nativeQuery = true)
-    List<IRevenuesInMonth> getRevenuesInMonth(Integer year, Integer month);
+    List<IRevenuesInMonth> getRevenuesInMonth(@Param("year") Integer year,
+                                              @Param("month") Integer month);
 
     @Query("select count(a) " +
             "from Account as a " +
@@ -48,5 +50,5 @@ public interface StatisticsRepository extends JpaRepository<Order, String> {
     @Query("select count(form) " +
             "from RegisterTeacherForm as form " +
             "where form.status = :status")
-    Integer countRequestByStatus(String status);
+    Integer countRequestByStatus(@Param("status") String status);
 }

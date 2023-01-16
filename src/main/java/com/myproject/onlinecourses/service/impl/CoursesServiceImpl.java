@@ -15,6 +15,7 @@ import com.myproject.onlinecourses.repository.CoursesRepository;
 import com.myproject.onlinecourses.service.CoursesService;
 import com.myproject.onlinecourses.specification.CoursesSpecification;
 import com.myproject.onlinecourses.utils.PaginationConstants;
+import com.paypal.api.payments.Search;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -23,9 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -87,8 +86,10 @@ public class CoursesServiceImpl implements CoursesService {
             if(!criteria.getValue().equals(""))
                 specification.add(criteria);
         }
+
         Pageable pageable = PageRequest.of(page.orElse(0), limit.orElse(10));
         Page<Course> courses = coursesRepo.findAll(specification, pageable);
+
         Page<CourseDTO> dtos = courses.map(new Function<Course, CourseDTO>() {
             @Override
             public CourseDTO apply(Course course) {

@@ -102,6 +102,7 @@ public class CoursesSpecification implements Specification<Course> {
             Predicate or = criteriaBuilder.or(orPredicates.toArray(new Predicate[0]));
             predicates.add(or);
         }
+
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
 }

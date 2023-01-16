@@ -14,12 +14,13 @@ public interface CartDetailRepository extends JpaRepository<CartDetail, Integer>
     @Query("select c " +
             "from CartDetail  c " +
             "where c.course.id = :courseId and c.cart.account.username = :username")
-    Optional<CartDetail> getFirstByUsernameAndCourseId(String username, String courseId);
+    Optional<CartDetail> getFirstByUsernameAndCourseId(@Param("username")String username,
+                                                       @Param("courseId") String courseId);
 
     @Query("select c " +
             "from CartDetail c " +
             "where c.cart.username = :username")
-    List<CartDetail> findAllByUsername(String username);
+    List<CartDetail> findAllByUsername(@Param("username") String username);
 
     @Modifying
     @Query("delete from CartDetail as c where c.course.id = :courseId and c.cart.username = :username")
