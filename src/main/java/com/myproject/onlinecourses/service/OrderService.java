@@ -26,5 +26,5 @@ public interface OrderService {
 
     ResponseObject getAllActiveOrder(Optional<Integer> page, Optional<Integer> limit);
 
-    ResponseObject getDetailOrderById(String orderId);
+    ResponseObject getDetailOrderById(String orderId, String username);
 }

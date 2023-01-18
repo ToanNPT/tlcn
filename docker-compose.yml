@@ -25,12 +25,11 @@ services:
       - server-network
   client:
     container_name: client_app
-    image: client:1.0
+    image: client:2.0
     ports:
       - 3000:3000
     networks:
       - server-network
-
 
 networks:
   server-network:

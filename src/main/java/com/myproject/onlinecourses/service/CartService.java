@@ -5,7 +5,7 @@ import com.myproject.onlinecourses.dto.ResponseObject;
 import java.util.List;
 
 public interface CartService {
-    ResponseObject getCartDetailById(Integer id);
+    ResponseObject getCartDetailById(Integer id, String username);
 
     ResponseObject getByUsername(String username);
 

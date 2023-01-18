@@ -10,6 +10,7 @@ import com.myproject.onlinecourses.entity.Cart;
 import com.myproject.onlinecourses.entity.CartDetail;
 import com.myproject.onlinecourses.entity.Course;
 import com.myproject.onlinecourses.exception.DuplicateException;
+import com.myproject.onlinecourses.exception.ForbiddenException;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.AccountRepository;
 import com.myproject.onlinecourses.repository.CartDetailRepository;
@@ -45,10 +46,15 @@ public class CartServiceImpl implements CartService {
     CourseConverter courseConverter;
 
     @Override
-    public ResponseObject getCartDetailById(Integer id){
+    public ResponseObject getCartDetailById(Integer id, String username){
         Optional<CartDetail> cartDetail = cartDetailRepo.findById(id);
+
         if(!cartDetail.isPresent())
             throw new NotFoundException("Can not find cart detail by id "+ id);
+
+        if(!cartDetail.get().getCart().getAccount().getUsername().equals(username))
+            throw new ForbiddenException();
+
         return new ResponseObject(converter.entityToCartDetailDTO(cartDetail.get()));
     }
 
@@ -69,12 +75,9 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseObject delete(String id, String username){
-        Optional<Account> account = accountRepo.findById(username);
-        if(!account.isPresent()) throw new NotFoundException("Can not found username: " + username);
         Optional<CartDetail> cartDetail = cartDetailRepo.getFirstByUsernameAndCourseId(username, id);
         if(!cartDetail.isPresent()) throw new NotFoundException("Can not found your item");
-        if(account.get().getUsername() != cartDetail.get().getCart().getUsername())
-            throw new NotFoundException("Can not delete cart, something wrong");
+
         Optional<Cart> cart = cartRepo.findById(username);
         double total = cart.get().getTotalPrice() - cartDetail.get().getCourse().getPrice();
         cart.get().setTotalPrice(Math.round(total*100)/100.00);

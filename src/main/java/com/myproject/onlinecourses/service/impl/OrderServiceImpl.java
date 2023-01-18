@@ -1,11 +1,14 @@
 package com.myproject.onlinecourses.service.impl;
 
+import com.myproject.onlinecourses.converter.AccountConvert;
 import com.myproject.onlinecourses.converter.CourseConverter;
 import com.myproject.onlinecourses.converter.OrderConverter;
 import com.myproject.onlinecourses.dto.*;
 import com.myproject.onlinecourses.entity.*;
+import com.myproject.onlinecourses.exception.ForbiddenException;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.*;
+import com.myproject.onlinecourses.security.Roles;
 import com.myproject.onlinecourses.service.CartService;
 import com.myproject.onlinecourses.service.CouponService;
 import com.myproject.onlinecourses.service.OrderService;
@@ -291,10 +294,21 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseObject getDetailOrderById(String orderId){
+    public ResponseObject getDetailOrderById(String orderId, String username){
+        Optional<Account> account = accountRepo.findById(username);
+
         Optional<Order> order = orderRepo.findById(orderId);
         if(!order.isPresent())
             throw new NotFoundException("Can not found order id "+ orderId);
+
+        if(account.isPresent()){
+            if(account.get().getRole() != null){
+                if(!account.get().getRole().getName().equals(Roles.ADMIN.value)
+                        && !account.get().getUsername().equals(order.get().getAccount().getUsername())){
+                    throw new ForbiddenException();
+                }
+            }
+        }
 
         DetailOrder dto = converter.orderToDetailOrder(order.get());
         List<CourseDTO> coursesPaids = new ArrayList<>();

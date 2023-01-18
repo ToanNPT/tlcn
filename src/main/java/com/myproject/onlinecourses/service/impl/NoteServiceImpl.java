@@ -7,6 +7,7 @@ import com.myproject.onlinecourses.entity.Account;
 import com.myproject.onlinecourses.entity.CoursePaid;
 import com.myproject.onlinecourses.entity.CoursesVideo;
 import com.myproject.onlinecourses.entity.Note;
+import com.myproject.onlinecourses.exception.ForbiddenException;
 import com.myproject.onlinecourses.exception.NotFoundException;
 import com.myproject.onlinecourses.repository.*;
 import com.myproject.onlinecourses.service.CoursePaidService;
@@ -14,6 +15,7 @@ import com.myproject.onlinecourses.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,14 +40,28 @@ public class NoteServiceImpl implements NoteService {
     NoteConverter converter;
 
     @Override
-    public ResponseObject getNoteById(Integer id){
+    public ResponseObject getNoteById(Integer id, String username){
+
         Optional<Note> note = noteRepo.findById(id);
         if(!note.isPresent())
             throw new NotFoundException("Can not found note with id "+ id);
+
+        if(!note.get().getUsername().equals(username)){
+            throw new ForbiddenException();
+        }
+
         return new ResponseObject(converter.entityToDTO(note.get()));
     }
     @Override
     public ResponseObject getNotesByUsernameAndVideo(String username, Integer courseVideoId){
+        Optional<CoursesVideo> video = courseVideoRepo.findById(courseVideoId);
+        if(!video.isPresent())
+            throw new NotFoundException("Can not found video with id: " + courseVideoId);
+
+        Optional<CoursePaid> isPaid = coursePaidRepository.isPaid(video.get().getCourse().getId(), username);
+        if(!isPaid.isPresent())
+            throw new ForbiddenException();
+
         List<Note> notes = noteRepo.getNotesByUsernameAnAndVideoId(username, courseVideoId);
         return new ResponseObject(notes);
     }
@@ -58,9 +74,9 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public ResponseObject addNote(NoteDTO dto){
-        Optional<Account> account = accountRepo.findById(dto.getUsername());
+//        Optional<Account> account = accountRepo.findById(dto.getUsername());
         Optional<CoursesVideo> video = courseVideoRepo.findById(dto.getVideoId());
-        if(!account.isPresent() || !video.isPresent())
+        if(!video.isPresent())
             throw new NotFoundException("Something is wrong when try adding");
 
         Optional<CoursePaid> check = coursePaidRepository.isPaid(video.get().getCourse().getId(),
@@ -82,9 +98,13 @@ public class NoteServiceImpl implements NoteService {
     public ResponseObject updateNote(NoteDTO dto){
         Optional<Note> note = noteRepo.findById(dto.getId());
         if(!note.isPresent()) throw new NotFoundException("Can not found note");
-        Optional<Account> account = accountRepo.findById(dto.getUsername());
+
+        if(!note.get().getUsername().equals(dto.getUsername())){
+            throw new ForbiddenException();
+        }
+
         Optional<CoursesVideo> video = courseVideoRepo.findById(dto.getVideoId());
-        if(!account.isPresent() || !video.isPresent())
+        if(!video.isPresent())
             throw new NotFoundException("Something is wrong when try adding");
 
         //String check = coursesRepo.checkPurchaseCourse(dto.getUsername(), video.get().getCourse().getId());
@@ -100,9 +120,13 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public ResponseObject deleteNote(Integer id){
+    public ResponseObject deleteNote(Integer id, String username){
         Optional<Note> note = noteRepo.findById(id);
-        if(!note.isPresent()) throw new NotFoundException("Can not found note");
+        if(!note.isPresent())
+            throw new NotFoundException("Can not found note");
+        if(!note.get().getUsername().equals(username))
+            throw new ForbiddenException();
+
         noteRepo.delete(note.get());
         return new ResponseObject("", "200", "delete successful", null);
     }

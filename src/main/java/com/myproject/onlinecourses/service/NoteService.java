@@ -4,7 +4,7 @@ import com.myproject.onlinecourses.dto.NoteDTO;
 import com.myproject.onlinecourses.dto.ResponseObject;
 
 public interface NoteService {
-    ResponseObject getNoteById(Integer id);
+    ResponseObject getNoteById(Integer id, String username);
 
     ResponseObject getNotesByUsernameAndVideo(String username, Integer courseVideoId);
 
@@ -14,5 +14,5 @@ public interface NoteService {
 
     ResponseObject updateNote(NoteDTO dto);
 
-    ResponseObject deleteNote(Integer id);
+    ResponseObject deleteNote(Integer id, String username);
 }
